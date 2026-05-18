@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Old/backup files
+*.backup
+*.bak
+*~.html
+
+# Dependencies (not needed — zero dependency architecture)
+node_modules/
+package-lock.json
+
+# Build artifacts
+dist/
+build/
+
+# Environment
+.env
+.env.local
