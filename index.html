@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHANTOM OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],body:['Plus Jakarta Sans','sans-serif']}}}}</script>
+    <style>
+        :root{--bg:#050509;--surface:#0a0a14;--card:#0f0f1d;--border:#1a1a30;--cyan:#00d4ff;--blue:#0066ee;--purple:#8b5cf6;--green:#22c55e;--pink:#f472b6;--amber:#f59e0b;--red:#ef4444;--text:#e8e8f2;--muted:#5a5a78;}
+        /* ── LIGHT THEME ── */
+        [data-theme="light"]{--bg:#f0f2f8;--surface:#e4e7f0;--card:#ffffff;--border:#c8ccd8;--text:#1a1a2e;--muted:#7a7a9a;}
+        [data-theme="light"] .cam-ov{background:radial-gradient(ellipse at 50% 50%,transparent 15%,rgba(240,242,248,.7) 65%,var(--bg) 90%);}
+        [data-theme="light"] #sidebar{background:rgba(228,231,240,.95);}
+        [data-theme="light"] #aiPanel{background:rgba(228,231,240,.95);}
+        [data-theme="light"] .app-view{background:rgba(240,242,248,.98);}
+        [data-theme="light"] .cam-btn{background:rgba(255,255,255,.9);border-color:rgba(0,212,255,.2);}
+        [data-theme="light"] .hint-bar{background:rgba(228,231,240,.95);border-color:rgba(0,0,0,.06);}
+        [data-theme="light"] .app-item-ic{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.06);}
+        [data-theme="light"] .m-btn:hover{background:rgba(0,0,0,.03);}
+        [data-theme="light"] .m-btn.on{background:rgba(0,212,255,.06);}
+        [data-theme="light"] #onboarding{background:rgba(240,242,248,.98);}
+        [data-theme="light"] #bootScreen{background:var(--bg);}
+        [data-theme="light"] .b-logo{color:var(--blue);}
+        [data-theme="light"] .ob-gesture-item{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.05);}
+        [data-theme="light"] .scanl::after{background:linear-gradient(90deg,transparent,rgba(0,102,238,.04),transparent);}
+        [data-theme="light"] .music-play-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08);}
+        [data-theme="light"] .note-editor{background:var(--card);border-color:var(--border);}
+        [data-theme="light"] .br-bookmark{background:var(--card);border-color:var(--border);}
+        [data-theme="light"] .msg-contact:hover{background:rgba(0,0,0,.02);}
+        [data-theme="light"] .music-row:hover{background:rgba(0,0,0,.02);}
+        [data-theme="light"] .msg-bubble.recv{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.1);}
+        [data-theme="light"] .msg-bubble.sent{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.1);}
+        [data-theme="light"] .vk-key{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06);color:rgba(26,26,46,.7);}
+        [data-theme="light"] .vk-text-display{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.15);}
+        [data-theme="light"] .toast-info{background:rgba(0,102,238,.08);border-color:rgba(0,102,238,.12);color:var(--blue);}
+        [data-theme="light"] .toast-ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.12);}
+        [data-theme="light"] .toast-voice{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.12);}
+        [data-theme="light"] .toast-err{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.12);}
+        [data-theme="light"] .cam-error-popup{background:rgba(240,242,248,.98);}
+        [data-theme="light"] .cam-error-card{background:var(--card);border-color:var(--border);}
+        [data-theme="light"] .cam-error-card .fix-box{background:var(--surface);border-color:var(--border);}
+        [data-theme="light"] .cam-error-card code{background:var(--bg);}
+        [data-theme="light"] .br-url-bar{background:var(--surface);border-color:var(--border);}
+        [data-theme="light"] .br-url-input{color:var(--text);}
+        [data-theme="light"] .msg-avatar{border:1px solid rgba(0,0,0,.06);}
+        [data-theme="light"] .v-pill{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.15);}
+        [data-theme="light"] .ai-typing-dots span{background:var(--blue);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;height:100vh;width:100vw;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s;}
+
+        /* ── ONBOARDING ── */
+        #onboarding{position:fixed;inset:0;z-index:10000;background:rgba(5,5,9,.98);display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s;}#onboarding.done{opacity:0;visibility:hidden;pointer-events:none;}
+        .ob-card{max-width:520px;width:90%;text-align:center;padding:2.5rem 2rem;max-height:90vh;overflow-y:auto;}
+        .ob-step{display:none;animation:fU .5s ease;}.ob-step.active{display:block;}
+        .ob-icon{width:64px;height:64px;border-radius:18px;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+        .ob-title{font-family:'Space Grotesk';font-size:1.4rem;font-weight:700;margin-bottom:.5rem;letter-spacing:.02em;}
+        .ob-desc{font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;}.ob-desc strong{color:var(--text);font-weight:600;}.ob-desc em{color:var(--cyan);font-style:normal;}
+        .ob-gesture-list{text-align:left;display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;}
+        .ob-gesture-item{display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);}
+        .ob-gesture-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+        .ob-gesture-text{font-size:.7rem;line-height:1.4;}.ob-gesture-text span{color:var(--cyan);font-family:'Space Grotesk';font-weight:600;}
+        .ob-voice-commands{text-align:left;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:1rem 0;font-size:.66rem;}
+        .ob-vc{padding:4px 8px;border-radius:4px;background:rgba(139,92,246,.06);color:var(--purple);font-family:'Space Grotesk';letter-spacing:.02em;}
+        .ob-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.6rem;border-radius:8px;border:none;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.03em;}.ob-btn-primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;}.ob-btn-primary:hover{transform:scale(1.03);box-shadow:0 0 20px rgba(0,212,255,.3);}
+        .ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem;}.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;}.ob-dot.active{background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.4);}
+
+        /* ── BOOT ── */
+        #bootScreen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s,visibility 1s;}#bootScreen.done{opacity:0;visibility:hidden;pointer-events:none;}
+        .b-logo{font-family:'Space Grotesk';font-size:clamp(2.5rem,6vw,5rem);font-weight:700;letter-spacing:.3em;color:var(--cyan);opacity:0;filter:blur(12px);}.b-logo.show{animation:bT 1.4s cubic-bezier(.4,0,.2,1) forwards;}
+        .b-sub{font-size:.7rem;letter-spacing:.5em;color:var(--muted);text-transform:uppercase;opacity:0;margin-top:.5rem;}.b-sub.show{animation:fU .8s ease forwards;}
+        .b-div{width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;margin-top:2rem;}.b-div.show{animation:fU .6s ease forwards;}
+        .b-log{margin-top:1.8rem;text-align:center;min-height:110px;}
+        .b-line{font-size:.6rem;color:var(--muted);font-family:'Space Grotesk',monospace;letter-spacing:.08em;opacity:0;padding:2px 0;}.b-line.show{animation:fU .3s ease forwards;}
+        .b-bar-w{width:180px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:1.4rem;opacity:0;}.b-bar-w.show{animation:fU .3s ease forwards;}
+        .b-bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;transition:width .35s;}
+        @keyframes bT{0%{opacity:0;filter:blur(12px);letter-spacing:.6em}50%{filter:blur(0)}100%{opacity:1;letter-spacing:.3em}}
+        @keyframes fU{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+        @keyframes breathe{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
+
+        /* ── MAIN APP ── */
+        #mainApp{display:none;height:100vh;width:100vw;}#mainApp.show{display:flex;animation:appIn 1s ease forwards;}@keyframes appIn{from{opacity:0}to{opacity:1}}
+
+        /* ── SIDEBAR ── */
+        #sidebar{width:200px;min-width:200px;height:100vh;display:flex;flex-direction:column;padding:1rem .6rem;border-right:1px solid var(--border);background:rgba(8,8,16,.95);z-index:10;}
+        .sb-logo{display:flex;align-items:center;gap:.5rem;padding:0 .5rem;margin-bottom:1.5rem;}.sb-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:.85rem;color:#fff;}.sb-name{font-family:'Space Grotesk';font-size:.78rem;font-weight:600;letter-spacing:.1em;}
+        .sb-sect{font-size:.5rem;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;padding:0 .5rem;margin:.6rem 0 .3rem;}
+        .m-btn{display:flex;align-items:center;gap:.5rem;padding:.45rem .55rem;border-radius:8px;cursor:pointer;font-size:.72rem;color:var(--muted);transition:all .25s;position:relative;border:none;background:none;width:100%;text-align:left;font-family:inherit;}.m-btn:hover{color:var(--text);background:rgba(255,255,255,.02);}.m-btn.on{color:var(--cyan);background:rgba(0,212,255,.04);}.m-btn.on::after{content:'';position:absolute;left:0;top:18%;height:64%;width:2px;background:var(--cyan);border-radius:2px;box-shadow:0 0 8px var(--cyan);}.m-btn i{width:16px;text-align:center;font-size:.78rem;}
+        .st-row{display:flex;align-items:center;gap:.4rem;padding:.15rem .5rem;font-size:.66rem;color:var(--muted);}.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}.dot.on{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5);}.dot.off{background:var(--muted);}.dot.err{background:var(--red);}
+        .g-disp{padding:0 .5rem;font-family:'Space Grotesk',monospace;font-size:.74rem;color:var(--cyan);min-height:1.2rem;margin-top:.2rem;}
+        .mic-tog{display:flex;align-items:center;gap:.5rem;padding:.5rem;cursor:pointer;border-radius:8px;transition:all .25s;}.mic-tog:hover{background:rgba(255,255,255,.02);}
+        .mic-ic{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--muted);transition:all .3s;}.mic-ic.on{border-color:var(--purple);color:var(--purple);box-shadow:0 0 12px rgba(139,92,246,.3);animation:pulse 2s ease infinite;}
+        .mic-lb{font-size:.66rem;color:var(--muted);}
+        .help-btn{display:flex;align-items:center;gap:.45rem;padding:.4rem .5rem;cursor:pointer;border-radius:7px;transition:all .25s;color:var(--muted);font-size:.64rem;margin-top:.3rem;}.help-btn:hover{background:rgba(255,255,255,.02);color:var(--text);}
+        /* ── GESTURE HOVER on sidebar/AI elements ── */
+        .m-btn.glow{color:var(--cyan)!important;background:rgba(0,212,255,.08)!important;box-shadow:0 0 12px rgba(0,212,255,.15);}
+        .mic-tog.glow{background:rgba(139,92,246,.08);border-radius:8px;}
+        .mic-tog.glow .mic-ic{border-color:var(--purple);color:var(--purple);box-shadow:0 0 10px rgba(139,92,246,.25);}
+        .help-btn.glow{background:rgba(0,212,255,.06);color:var(--cyan);}
+        /* ── THEME TOGGLE ── */
+        .theme-tog{display:flex;align-items:center;justify-content:center;padding:.5rem;cursor:pointer;border-radius:8px;transition:all .25s;margin-top:auto;}.theme-tog:hover{background:rgba(255,255,255,.03);}
+        .theme-ic{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--amber);transition:all .3s;}.theme-ic.on{border-color:var(--purple);color:var(--purple);box-shadow:0 0 12px rgba(139,92,246,.3);}
+        .theme-tog.glow .theme-ic{border-color:var(--purple);color:var(--purple);box-shadow:0 0 14px rgba(139,92,246,.35);}
+        [data-theme="light"] .theme-ic{color:var(--amber);border-color:rgba(0,0,0,.12);}
+        [data-theme="light"] .theme-tog:hover{background:rgba(0,0,0,.03);}
+        .back-btn.glow{background:rgba(0,212,255,.15)!important;border-color:rgba(0,212,255,.4)!important;box-shadow:0 0 14px rgba(0,212,255,.2);}
+        .ai-snd.glow{transform:scale(1.1);box-shadow:0 0 16px rgba(0,212,255,.4);}
+        .music-play-btn.glow{background:rgba(0,212,255,.1)!important;border-color:rgba(0,212,255,.25)!important;color:var(--cyan)!important;}
+        .msg-contact.glow{background:rgba(255,255,255,.04);}
+        .br-bookmark.glow{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.05);}
+        .cam-btn.glow{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.3);box-shadow:0 0 16px rgba(0,212,255,.2);}
+        .music-row.glow{background:rgba(0,212,255,.06)!important;box-shadow:0 0 20px rgba(0,212,255,.1);}
+        .music-row.glow .music-play-btn{background:rgba(0,212,255,.1)!important;border-color:rgba(0,212,255,.25)!important;color:var(--cyan)!important;}
+        .music-ctrl.glow{color:var(--cyan)!important;text-shadow:0 0 10px rgba(0,212,255,.4);background:rgba(0,212,255,.06);border-radius:50%;}
+        .chat-back-btn.glow{color:var(--cyan)!important;background:rgba(0,212,255,.08);}
+
+        /* ── CENTER AREA ── */
+        #centerArea{flex:1;position:relative;overflow:hidden;background:var(--bg);}
+        #webcam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);opacity:0;transition:opacity .8s;z-index:0;pointer-events:none;}#webcam.on{opacity:.15;}
+        .cam-ov{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 15%,rgba(5,5,10,.7) 65%,var(--bg) 90%);}
+        #overlayCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;will-change:contents;}
+        #atmosCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;will-change:contents;}
+        .mode-tag{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;font-family:'Space Grotesk';font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);opacity:.5;pointer-events:none;transition:all .4s;}
+        .cam-btn{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:9;width:52px;height:52px;border-radius:16px;border:1px solid rgba(0,212,255,.12);background:rgba(10,10,20,.85);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--cyan);cursor:pointer;transition:all .3s;animation:breathe 3s ease infinite;}.cam-btn:hover{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.25);transform:translateX(-50%) scale(1.05);}.cam-btn.on{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.15);color:var(--green);animation:none;}.cam-btn.loading{pointer-events:none;opacity:.5;}
+        .cam-error-popup{position:absolute;inset:0;z-index:50;background:rgba(5,5,9,.98);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s;}.cam-error-popup.show{opacity:1;visibility:visible;}
+        .cam-error-card{max-width:480px;width:90%;padding:2rem;border-radius:16px;background:var(--card);border:1px solid var(--border);}
+        .cam-error-card h3{font-family:'Space Grotesk';font-size:1.1rem;font-weight:700;margin-bottom:.8rem;color:var(--red);display:flex;align-items:center;gap:.5rem;}
+        .cam-error-card p{font-size:.74rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;}
+        .cam-error-card .fix-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem;}
+        .cam-error-card .fix-box h4{font-size:.72rem;font-weight:600;color:var(--cyan);margin-bottom:.5rem;}
+        .cam-error-card .fix-box code{display:block;font-size:.66rem;color:var(--text);background:var(--bg);padding:.5rem .7rem;border-radius:6px;font-family:'Space Grotesk',monospace;margin-bottom:.5rem;word-break:break-all;}
+        .cam-error-card .fix-box .copy-btn{font-size:.62rem;color:var(--cyan);cursor:pointer;border:none;background:none;font-family:inherit;}.cam-error-card .fix-box .copy-btn:hover{text-decoration:underline;}
+        .cam-error-close{padding:.5rem 1.2rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .2s;}.cam-error-close:hover{background:rgba(255,255,255,.03);color:var(--text);}
+
+        /* ── VOICE PILL ── */
+        .v-pill{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:.5rem;padding:.35rem .9rem;border-radius:16px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.1);opacity:0;transition:all .3s;pointer-events:none;}.v-pill.on{opacity:1;}
+        .v-bars{display:flex;align-items:center;gap:2px;height:14px;}.v-bar{width:2.5px;border-radius:2px;background:var(--purple);height:3px;}.v-pill.on .v-bar{animation:vb .45s ease infinite alternate;}.v-bar:nth-child(1){animation-delay:0s}.v-bar:nth-child(2){animation-delay:.08s}.v-bar:nth-child(3){animation-delay:.16s}.v-bar:nth-child(4){animation-delay:.08s}.v-bar:nth-child(5){animation-delay:0s}@keyframes vb{0%{height:3px}100%{height:14px}}
+        .v-pill span{font-size:.66rem;color:var(--purple);font-family:'Space Grotesk',monospace;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+        /* ── CURSOR ── */
+        #phantomCursor{position:fixed;z-index:10020;pointer-events:none;width:28px;height:28px;transform:translate(-50%,-50%);opacity:0;transition:width .1s,height .1s;will-change:transform;}#phantomCursor.vis{opacity:1;}
+        .c-ring{position:absolute;inset:0;border:2px solid var(--cyan);border-radius:50%;box-shadow:0 0 12px rgba(0,212,255,.3);transition:all .1s;}.c-dot{position:absolute;top:50%;left:50%;width:4px;height:4px;background:var(--cyan);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--cyan);}
+        .c-pinch-bar{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;opacity:0;transition:opacity .15s;}
+        .c-pinch-fill{height:100%;width:0%;background:var(--purple);border-radius:2px;transition:width .08s;}
+        #phantomCursor.near-pinch .c-pinch-bar{opacity:1;}
+        #phantomCursor.near-pinch .c-ring{border-color:rgba(139,92,246,.7);box-shadow:0 0 14px rgba(139,92,246,.25);}
+        #phantomCursor.pinching .c-ring{width:14px;height:14px;top:7px;left:7px;border-color:var(--purple);box-shadow:0 0 16px rgba(139,92,246,.5);}
+        #phantomCursor.pinching .c-pinch-bar{opacity:0;}
+        #phantomCursor.palm .c-ring{width:44px;height:44px;top:-8px;left:-8px;border-color:var(--cyan);opacity:.5;}
+        #phantomCursor.point .c-ring{border-color:#fff;box-shadow:0 0 14px rgba(255,255,255,.35);}
+        .c-label{position:absolute;top:34px;left:50%;transform:translateX(-50%);font-size:.55rem;font-family:'Space Grotesk',monospace;color:var(--cyan);white-space:nowrap;opacity:.8;pointer-events:none;letter-spacing:.05em;}
+
+        /* ── EFFECTS ── */
+        .g-pulse{position:absolute;z-index:16;pointer-events:none;border-radius:50%;border:1.5px solid var(--cyan);animation:gp .55s ease forwards;}@keyframes gp{0%{width:8px;height:8px;opacity:1;transform:translate(-50%,-50%) scale(1)}100%{width:70px;height:70px;opacity:0;transform:translate(-50%,-50%) scale(1)}}
+        .action-fb{position:absolute;z-index:22;pointer-events:none;padding:.4rem .9rem;border-radius:8px;font-size:.7rem;font-family:'Space Grotesk';font-weight:600;letter-spacing:.04em;animation:actFb .9s ease forwards;white-space:nowrap;}@keyframes actFb{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}60%{opacity:1;transform:translate(-50%,-80%) scale(1.05)}100%{opacity:0;transform:translate(-50%,-130%) scale(.9)}}
+
+        /* ── HOME SCREEN ── */
+        .home-screen{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);}.home-screen.hidden{opacity:0;transform:scale(.95);pointer-events:none;}
+        .home-title{font-family:'Space Grotesk';font-size:1rem;font-weight:600;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+        .app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;padding:0 2rem;transition:transform .3s cubic-bezier(.4,0,.2,1);}
+        .app-item{display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:pointer;transition:all .3s;}.app-item-ic{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid rgba(255,255,255,.06);background:rgba(18,18,34,.8);transition:all .3s;}.app-item-lb{font-size:.6rem;letter-spacing:.06em;color:var(--muted);transition:color .3s;}.app-item:hover .app-item-ic,.app-item.glow .app-item-ic{box-shadow:0 0 30px rgba(0,212,255,.25),0 8px 25px rgba(0,0,0,.3);border-color:rgba(0,212,255,.15);transform:scale(1.15) translateY(-2px);background:rgba(0,212,255,.06);}.app-item:hover .app-item-lb,.app-item.glow .app-item-lb{color:var(--text);}.app-item:active .app-item-ic{transform:scale(.95);}
+
+        /* ── APP VIEW ── */
+        .app-view{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;background:rgba(8,8,16,.98);transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);opacity:0;transform:scale(.92);pointer-events:none;}.app-view.active{opacity:1;transform:scale(1);pointer-events:auto;}
+        .app-view-hd{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;border-bottom:1px solid var(--border);}.app-view-title{display:flex;align-items:center;gap:.6rem;font-family:'Space Grotesk';font-size:.82rem;font-weight:600;letter-spacing:.06em;}
+        .app-view-body{flex:1;overflow-y:auto;padding:1.2rem;}.app-view-body::-webkit-scrollbar{width:3px;}.app-view-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+        .back-btn{display:flex;align-items:center;gap:.5rem;padding:.45rem 1.2rem;border-radius:10px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-size:.72rem;font-family:'Space Grotesk';font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.04em;}.back-btn:hover{background:rgba(0,212,255,.12);border-color:rgba(0,212,255,.35);transform:translateX(-2px);}
+        .home-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:30;width:140px;height:5px;border-radius:5px;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s;opacity:0;pointer-events:none;}.home-bar.show{opacity:1;pointer-events:auto;}.home-bar:hover{background:rgba(255,255,255,.4);width:160px;}
+        .esc-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:30;font-size:.55rem;color:var(--muted);letter-spacing:.1em;font-family:'Space Grotesk',monospace;opacity:0;pointer-events:none;transition:opacity .3s;}.esc-hint.show{opacity:.6;}
+
+        /* ── TRACKING / HINTS ── */
+        .track-ind{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:9;padding:.3rem .7rem;border-radius:20px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.1);font-family:'Space Grotesk';font-size:.55rem;letter-spacing:.15em;color:var(--cyan);opacity:0;transition:all .3s;pointer-events:none;}.track-ind.on{opacity:1;}
+        .scanl{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;}.scanl::after{content:'';position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.015),transparent);animation:scanM 8s linear infinite;}@keyframes scanM{0%{top:-2px}100%{top:100%}}
+        .hint-bar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:9;display:flex;gap:1.2rem;padding:.4rem 1rem;border-radius:12px;background:rgba(10,10,18,.92);border:1px solid rgba(255,255,255,.04);transition:all .4s;pointer-events:none;}.hint-item{display:flex;align-items:center;gap:.4rem;font-size:.6rem;color:var(--muted);white-space:nowrap;}.hint-item i{font-size:.68rem;color:rgba(0,212,255,.4);}.hint-item.active-hint{color:var(--cyan);}.hint-item.active-hint i{color:var(--cyan);}
+
+        /* ── VIRTUAL KEYBOARD ── */
+        .vk-overlay{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:13;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;visibility:hidden;transition:opacity .4s,transform .4s;pointer-events:none;transform:translateX(-50%) translateY(20px);}
+        .vk-overlay.active{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+        .vk-text-display{width:460px;max-width:85vw;min-height:36px;padding:8px 14px;border-radius:10px;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);font-family:'Space Grotesk',monospace;font-size:.82rem;color:var(--cyan);letter-spacing:.04em;word-break:break-all;box-shadow:0 0 20px rgba(0,212,255,.04),inset 0 0 12px rgba(0,212,255,.02);text-shadow:0 0 8px rgba(0,212,255,.3);min-height:36px;display:flex;align-items:center;}.vk-text-display .vk-cursor-blink{display:inline-block;width:2px;height:1em;background:var(--cyan);margin-left:1px;animation:blink 1s step-end infinite;vertical-align:text-bottom;}.vk-cursor-blink.off{opacity:0;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+        @keyframes vkDwell{0%,100%{box-shadow:0 0 20px rgba(0,212,255,.2)}50%{box-shadow:0 0 30px rgba(0,212,255,.35)}}
+        .vk-keyboard{display:flex;flex-direction:column;gap:5px;align-items:center;}
+        .vk-row{display:flex;gap:7px;justify-content:center;}
+        .vk-key{width:48px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-size:.72rem;font-weight:500;color:rgba(255,255,255,.6);background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);transition:all .15s cubic-bezier(.4,0,.2,1);position:relative;user-select:none;letter-spacing:.02em;cursor:pointer;}
+        .vk-key::before{content:'';position:absolute;inset:0;border-radius:7px;background:transparent;transition:all .15s;}
+        .vk-key.vk-hover{color:var(--cyan);background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.2);box-shadow:0 0 16px rgba(0,212,255,.15),inset 0 0 8px rgba(0,212,255,.04);transform:scale(1.08) translateY(-2px);text-shadow:0 0 6px rgba(0,212,255,.4);}
+        .vk-key.vk-locked{color:var(--purple);background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);box-shadow:0 0 20px rgba(139,92,246,.2),inset 0 0 10px rgba(139,92,246,.05);transform:scale(1.1);text-shadow:0 0 8px rgba(139,92,246,.5);}
+        .vk-key.vk-dwell{border-color:rgba(0,212,255,.35);box-shadow:0 0 20px rgba(0,212,255,.2),0 0 4px rgba(0,212,255,.3) inset;animation:vkDwell 1s ease infinite;}
+        .vk-key.vk-pressed{color:#fff;background:rgba(0,212,255,.2);border-color:rgba(0,212,255,.4);box-shadow:0 0 24px rgba(0,212,255,.3),inset 0 0 12px rgba(0,212,255,.08);transform:scale(0.92);transition:transform .08s cubic-bezier(.4,0,.2,1);}
+        .vk-key.vk-special{width:62px;font-size:.56rem;letter-spacing:.06em;color:rgba(255,255,255,.35);}
+        .vk-key.vk-space{width:200px;font-size:.56rem;letter-spacing:.1em;}
+        .vk-key.vk-shift-active{color:var(--amber);border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.06);}
+
+        /* ── AI PANEL ── */
+        #aiPanel{width:300px;min-width:300px;height:100vh;display:flex;flex-direction:column;border-left:1px solid var(--border);background:rgba(8,8,16,.95);z-index:10;}
+        .ai-hd{padding:.9rem .8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.55rem;}.ai-av{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#fff;font-weight:700;font-family:'Space Grotesk';}.ai-nm{font-family:'Space Grotesk';font-size:.76rem;font-weight:600;letter-spacing:.06em;}.ai-st{font-size:.56rem;color:var(--green);}
+        .ai-msgs{flex:1;overflow-y:auto;padding:.7rem;display:flex;flex-direction:column;gap:.5rem;}.ai-msgs::-webkit-scrollbar{width:3px;}.ai-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px);}
+        .msg{max-width:92%;padding:.5rem .65rem;border-radius:10px;font-size:.7rem;line-height:1.6;animation:mS .3s ease;}@keyframes mS{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+        .msg.bot{background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.06);align-self:flex-start;border-bottom-left-radius:2px;}.msg.user{background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.07);align-self:flex-end;border-bottom-right-radius:2px;}.msg em{color:var(--cyan);font-style:normal;font-weight:500;}
+        /* AI typing indicator */
+        .ai-typing-dots{display:inline-flex;gap:4px;align-items:center;padding:2px 0;}
+        .ai-typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--cyan);opacity:.4;animation:aiDot .9s ease infinite;}
+        .ai-typing-dots span:nth-child(2){animation-delay:.15s;}
+        .ai-typing-dots span:nth-child(3){animation-delay:.3s;}
+        @keyframes aiDot{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+        .ai-row{padding:.6rem .7rem;border-top:1px solid var(--border);display:flex;gap:.35rem;}.ai-in{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.4rem .55rem;color:var(--text);font-size:.68rem;font-family:inherit;outline:none;transition:border-color .2s;}.ai-in:focus{border-color:rgba(0,212,255,.2);}.ai-in::placeholder{color:var(--muted);}.ai-snd{width:32px;height:32px;border-radius:7px;border:none;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .2s;flex-shrink:0;}.ai-snd:hover{transform:scale(1.05);box-shadow:0 0 12px rgba(0,212,255,.3);}
+
+        /* ── TOASTS ── */
+        #toasts{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:.3rem;pointer-events:none;}.toast{padding:.4rem .9rem;border-radius:7px;font-size:.66rem;letter-spacing:.02em;opacity:0;transform:translateY(6px);transition:all .3s;white-space:nowrap;}.toast.show{opacity:1;transform:translateY(0);}.toast-info{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.08);color:var(--cyan);}.toast-ok{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.08);color:var(--green);}.toast-voice{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.08);color:var(--purple);}.toast-err{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.08);color:var(--red);}
+
+        /* ── APP-SPECIFIC STYLES ── */
+        .br-url-bar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;margin-bottom:12px;}.br-url-bar i{color:var(--green);font-size:.7rem;}.br-url-input{flex:1;background:none;border:none;color:var(--text);font-size:.68rem;font-family:'Space Grotesk',monospace;outline:none;}
+        .br-bookmark{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;}.br-bookmark:hover{border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.03);}
+        .msg-contact{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:all .2s;}.msg-contact:hover{background:rgba(255,255,255,.02);}
+        .msg-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+        .msg-bubble{padding:10px 14px;border-radius:14px;font-size:.72rem;max-width:80%;line-height:1.5;}
+        .msg-bubble.recv{background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.08);align-self:flex-start;border-bottom-left-radius:4px;}
+        .msg-bubble.sent{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.07);align-self:flex-end;border-bottom-right-radius:4px;}
+        .music-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .2s;}.music-row:hover{background:rgba(255,255,255,.02);}
+        .music-row.playing{background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.08);}
+        .music-play-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--text);font-size:.8rem;flex-shrink:0;}.music-play-btn:hover{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.2);color:var(--cyan);}
+        .note-editor{width:100%;min-height:280px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-size:.72rem;font-family:inherit;outline:none;resize:vertical;line-height:1.7;transition:border-color .2s;}.note-editor:focus{border-color:rgba(0,212,255,.15);}
+
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+        @media(max-width:1100px){#sidebar{width:56px;min-width:56px;}.m-btn span,.sb-sect,.st-row span,.g-disp,.mic-lb,.sb-name,.help-btn span{display:none;}.m-btn{justify-content:center;padding:.45rem;}.mic-tog{justify-content:center;}.theme-tog{justify-content:center;}}
+        @media(max-width:850px){#aiPanel{width:240px;min-width:240px;}}
+        @media(max-width:680px){#aiPanel{display:none;}}
+        /* ── MOBILE PERFORMANCE ── */
+        @media(max-width:768px){
+            .vk-key{width:40px;height:38px;font-size:.66rem;}
+            .vk-key.vk-special{width:52px;}
+            .vk-key.vk-space{width:160px;}
+            .vk-row{gap:5px;}
+            .vk-text-display{width:340px;max-width:90vw;font-size:.74rem;}
+            .scanl{display:none;}
+            .cam-btn{animation:none;} /* disable breathe animation on mobile */
+        }
+    </style>
+</head>
+<body>
+
+<div id="onboarding">
+    <div class="ob-card">
+        <div class="ob-dots" id="obDots"></div>
+        <div class="ob-step active" data-step="0"><div class="ob-icon" style="background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(139,92,246,.08));color:var(--cyan);"><i class="fa-solid fa-hand"></i></div><div class="ob-title">Welcome to PHANTOM OS</div><div class="ob-desc">A <strong>spatial interaction platform</strong> where you control everything with your hands and voice.</div><button class="ob-btn ob-btn-primary" onclick="obNext()">Get Started <i class="fa-solid fa-arrow-right"></i></button></div>
+        <div class="ob-step" data-step="1"><div class="ob-icon" style="background:rgba(0,212,255,.08);color:var(--cyan);"><i class="fa-solid fa-hand-pointer"></i></div><div class="ob-title">Hand Gestures</div><div class="ob-desc">Click the <em>camera icon</em> at the bottom to enable tracking:</div><div class="ob-gesture-list"><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(0,212,255,.08);color:var(--cyan);"><i class="fa-solid fa-hand-pointer"></i></div><div class="ob-gesture-text"><span>Point (index finger)</span><br>Move cursor, hover apps & keys</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(139,92,246,.08);color:var(--purple);"><i class="fa-solid fa-hand-peace"></i></div><div class="ob-gesture-text"><span>Pinch (thumb + index)</span><br>Click, select, type on virtual keyboard</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(34,197,94,.08);color:var(--green);"><i class="fa-solid fa-hand"></i></div><div class="ob-gesture-text"><span>Open Palm</span><br>Go back to Home</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(245,158,11,.08);color:var(--amber);"><i class="fa-solid fa-arrows-left-right"></i></div><div class="ob-gesture-text"><span>Swipe hand left/right</span><br>Switch modes / Swipe to go home in apps</div></div></div><button class="ob-btn ob-btn-primary" onclick="obNext()">Next <i class="fa-solid fa-arrow-right"></i></button></div>
+        <div class="ob-step" data-step="2"><div class="ob-icon" style="background:rgba(139,92,246,.08);color:var(--purple);"><i class="fa-solid fa-keyboard"></i></div><div class="ob-title">Spatial Keyboard</div><div class="ob-desc">Switch to <em>Spatial Typing Mode</em> to activate the virtual keyboard:</div><div class="ob-gesture-list"><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(0,212,255,.08);color:var(--cyan);"><i class="fa-solid fa-hand-pointer"></i></div><div class="ob-gesture-text"><span>Point to hover keys</span><br>Keys glow when your cursor is over them</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(139,92,246,.08);color:var(--purple);"><i class="fa-solid fa-hand-peace"></i></div><div class="ob-gesture-text"><span>Pinch to select</span><br>Type by pinching on highlighted keys</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(34,197,94,.08);color:var(--green);"><i class="fa-solid fa-microphone"></i></div><div class="ob-gesture-text"><span>Voice dictation</span><br>Or speak to type naturally</div></div></div><button class="ob-btn ob-btn-primary" onclick="obNext()">Next <i class="fa-solid fa-arrow-right"></i></button></div>
+        <div class="ob-step" data-step="3"><div class="ob-icon" style="background:rgba(139,92,246,.08);color:var(--purple);"><i class="fa-solid fa-microphone"></i></div><div class="ob-title">Voice Commands</div><div class="ob-desc">Click the <strong>mic button</strong> (or press <em>V</em>) then speak:</div><div class="ob-voice-commands"><div class="ob-vc">"Hey Phantom"</div><div class="ob-vc">"Focus mode"</div><div class="ob-vc">"Open browser"</div><div class="ob-vc">"Open music"</div><div class="ob-vc">"Go home"</div><div class="ob-vc">"Play music"</div><div class="ob-vc">"Premium AI"</div><div class="ob-vc">"Light mode"</div></div><button class="ob-btn ob-btn-primary" onclick="obNext()">Next <i class="fa-solid fa-arrow-right"></i></button></div>
+        <div class="ob-step" data-step="4"><div class="ob-icon" style="background:rgba(0,212,255,.08);color:var(--cyan);"><i class="fa-solid fa-rotate-left"></i></div><div class="ob-title">How to Go Back</div><div class="ob-desc">When an app is open full screen:</div><div class="ob-gesture-list"><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(0,212,255,.08);color:var(--cyan);"><i class="fa-solid fa-arrow-left"></i></div><div class="ob-gesture-text"><span>Click Back to Home</span><br>Top-right button</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(34,197,94,.08);color:var(--green);"><i class="fa-solid fa-hand"></i></div><div class="ob-gesture-text"><span>Open Palm gesture</span><br>Hold open palm for a moment</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(139,92,246,.08);color:var(--purple);"><i class="fa-solid fa-microphone"></i></div><div class="ob-gesture-text"><span>Say "Go Home"</span></div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(245,158,11,.08);color:var(--amber);"><i class="fa-solid fa-arrows-left-right"></i></div><div class="ob-gesture-text"><span>Swipe hand</span><br>Swipe left/right to go home</div></div><div class="ob-gesture-item"><div class="ob-gesture-icon" style="background:rgba(245,158,11,.08);color:var(--amber);"><i class="fa-solid fa-keyboard"></i></div><div class="ob-gesture-text"><span>Press Esc key</span></div></div></div><button class="ob-btn ob-btn-primary" onclick="obNext()">Next <i class="fa-solid fa-arrow-right"></i></button></div>
+        <div class="ob-step" data-step="5"><div class="ob-icon" style="background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(139,92,246,.1));color:var(--text);"><i class="fa-solid fa-rocket"></i></div><div class="ob-title">You're Ready</div><div class="ob-desc"><em>1-5</em> = modes &bull; <em>V</em> = voice &bull; <em>T</em> = theme &bull; <em>Esc</em> = home &bull; <em>?</em> = this guide. Camera requires <strong>HTTPS or localhost</strong>.</div><button class="ob-btn ob-btn-primary" onclick="obFinish()">Launch PHANTOM OS <i class="fa-solid fa-arrow-right"></i></button></div>
+    </div>
+</div>
+
+<div id="bootScreen"><div class="b-logo" id="bLogo">PHANTOM</div><div class="b-sub" id="bSub">Spatial Interaction System</div><div class="b-div" id="bDiv"></div><div class="b-log" id="bLog"></div><div class="b-bar-w" id="bBarW"><div class="b-bar" id="bBar"></div></div></div>
+
+<div id="mainApp">
+    <aside id="sidebar">
+        <div class="sb-logo"><div class="sb-mark">P</div><span class="sb-name">PHANTOM</span></div>
+        <div class="sb-sect">Modes</div>
+        <div id="modeList" style="display:flex;flex-direction:column;gap:1px;margin-bottom:.6rem;">
+            <button class="m-btn on" data-mode="productivity"><i class="fa-solid fa-cube"></i><span>Productivity</span></button>
+            <button class="m-btn" data-mode="entertainment"><i class="fa-solid fa-play"></i><span>Entertainment</span></button>
+            <button class="m-btn" data-mode="focus"><i class="fa-solid fa-bullseye"></i><span>Focus</span></button>
+            <button class="m-btn" data-mode="spatial_typing"><i class="fa-solid fa-keyboard"></i><span>Spatial Typing</span></button>
+            <button class="m-btn" data-mode="ai_assistant"><i class="fa-solid fa-brain"></i><span>AI Assistant</span></button>
+        </div>
+        <div class="sb-sect">Status</div>
+        <div class="st-row"><span class="dot off" id="dCam"></span><span>Camera</span></div>
+        <div class="st-row"><span class="dot off" id="dHand"></span><span>Hand Tracking</span></div>
+        <div class="st-row"><span class="dot off" id="dVoice"></span><span>Voice</span></div>
+        <div class="sb-sect">Gesture</div>
+        <div class="g-disp" id="gLabel">None</div>
+        <div class="mic-tog" id="micTog"><div class="mic-ic" id="micIc"><i class="fa-solid fa-microphone"></i></div><span class="mic-lb" id="micLb">Voice Off</span></div>
+        <div class="help-btn" id="helpBtn" onclick="showOb()"><i class="fa-solid fa-circle-question"></i><span>How to Use</span></div>
+        <div class="theme-tog" id="themeTog"><div class="theme-ic" id="themeIc"><i class="fa-solid fa-moon"></i></div></div>
+    </aside>
+    <main id="centerArea">
+        <video id="webcam" autoplay playsinline></video>
+        <div class="cam-ov"></div><div class="scanl"></div>
+        <canvas id="atmosCanvas"></canvas>
+        <canvas id="overlayCanvas"></canvas>
+        <div class="mode-tag" id="modeTag">Productivity Mode</div>
+        <div class="v-pill" id="vPill"><div class="v-bars"><div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div></div><span id="vTxt">Listening...</span></div>
+        <div class="track-ind" id="trackInd">TRACKING</div>
+        <div class="cam-btn" id="camBtn" onclick="event.stopPropagation(); requestCamera()" title="Enable camera"><i class="fa-solid fa-video"></i></div>
+        <div class="cam-error-popup" id="camErrorPopup"><div class="cam-error-card"><h3><i class="fa-solid fa-triangle-exclamation"></i> Camera Access Failed</h3><p>Browsers only allow camera on <strong>HTTPS or localhost</strong>. You're opening from a local file.</p><div class="fix-box"><h4><i class="fa-solid fa-terminal" style="margin-right:4px;"></i> Quick Fix</h4><p style="font-size:.64rem;color:var(--muted);margin-bottom:.5rem;">Open Terminal in your project folder, run:</p><code id="serverCmd">cd Desktop/phantom && python -m http.server 8000</code><button class="copy-btn" onclick="event.stopPropagation(); navigator.clipboard.writeText('cd Desktop/phantom && python -m http.server 8000');toast('Copied!','ok')"><i class="fa-solid fa-copy" style="margin-right:3px;"></i> Copy</button><p style="font-size:.6rem;color:var(--muted);margin-top:.5rem;">Then open: <span style="color:var(--cyan);">http://localhost:8000</span></p></div><div class="fix-box"><h4><i class="fa-solid fa-cloud" style="margin-right:4px;"></i> Better: Deploy online</h4><p style="font-size:.64rem;color:var(--muted);">Go to <span style="color:var(--cyan);">app.netlify.com/drop</span> — drag your folder — instant HTTPS link.</p></div><button class="cam-error-close" onclick="event.stopPropagation(); document.getElementById('camErrorPopup').classList.remove('show')">Use voice & mouse instead</button></div></div>
+
+        <!-- Virtual Keyboard Overlay -->
+        <div class="vk-overlay" id="vkOverlay">
+            <div class="vk-text-display" id="vkTextDisplay"><span id="vkText"></span><span class="vk-cursor-blink" id="vkBlink"></span></div>
+            <div class="vk-keyboard" id="vkKeyboard"></div>
+        </div>
+
+        <div class="home-screen" id="homeScreen"><div class="home-title">Applications</div><div class="app-grid" id="appGrid"></div></div>
+        <div class="app-view" id="appView"><div class="app-view-hd"><div class="app-view-title" id="appViewTitle"></div><button class="back-btn" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Back to Home</button></div><div class="app-view-body" id="appViewBody"></div></div>
+        <div class="home-bar" id="homeBar" onclick="goHome()"></div>
+        <div class="esc-hint" id="escHint">ESC to go home</div>
+        <div class="hint-bar" id="hintBar"><div class="hint-item" data-hint="point"><i class="fa-solid fa-hand-pointer"></i> Point = Move</div><div class="hint-item" data-hint="pinch"><i class="fa-solid fa-hand-peace"></i> Pinch = Click</div><div class="hint-item" data-hint="palm"><i class="fa-solid fa-hand"></i> Palm = Home</div><div class="hint-item" data-hint="voice"><i class="fa-solid fa-microphone"></i> V = Voice</div></div>
+    </main>
+    <aside id="aiPanel">
+        <div class="ai-hd"><div class="ai-av">P</div><div><div class="ai-nm">PHANTOM AI</div><div class="ai-st">Online · Qwen3</div></div></div>
+        <div class="ai-msgs" id="aiMsgs"><div class="msg bot">Welcome to <em>PHANTOM AI</em>. I'm your spatial assistant — powered by real-time AI. Ask me anything, or use voice commands to control your environment.</div></div>
+        <div class="ai-row"><input class="ai-in" id="aiIn" placeholder="Ask PHANTOM AI anything..." autocomplete="off"/><button class="ai-snd" id="aiSnd" aria-label="Send"><i class="fa-solid fa-arrow-up"></i></button></div>
+    </aside>
+</div>
+<div id="toasts"></div>
+<!-- Phantom cursor at body level so it can traverse the entire screen -->
+<div id="phantomCursor"><div class="c-ring"></div><div class="c-dot"></div><div class="c-pinch-bar"><div class="c-pinch-fill" id="cPinchFill"></div></div><div class="c-label" id="cLabel"></div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ═══════════════════════════════════════════
+// MOBILE PERFORMANCE DETECTION
+// ═══════════════════════════════════════════
+const isMobile=/Android|iPhone|iPad|iPod|webOS|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent)||innerWidth<768;
+const PERF={
+    particles:isMobile?4:10,            // Fewer particles = more CPU for tracking
+    particleDraw:isMobile?4:4,          // Redraw particles every Nth frame (saves CPU)
+    trailLen:isMobile?3:6,              // Shorter cursor trail = less canvas work
+    camW:isMobile?320:640,
+    camH:isMobile?240:480,
+    mpComplexity:0,                     // Always lite model for fastest response
+    mpDetectConf:isMobile?.4:.5,        // Very low = fastest detection
+    mpTrackConf:isMobile?.3:.4,         // Very low = fastest tracking lock
+    frameThrottle:isMobile?33:0,        // ~30fps on mobile, uncapped on desktop
+    drawHandSkeleton:isMobile?false:true,
+    drawGrid:isMobile?false:true,
+    drawRadial:isMobile?false:true,
+    hoverThrottle:1,                    // Check hover EVERY frame for instant response
+    rectCacheTTL:4,                     // Shorter cache = fresher positions
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const S={
+    mode:'productivity',gesture:'none',prevGesture:'none',stableGesture:'none',gestureHistory:[],
+    listening:false,handOn:false,camOn:false,mpReady:false,processing:false,
+    rawX:0,rawY:0,
+    sx:0,sy:0,pvx:0,pvy:0,
+    _prevSx:0,_prevSy:0,
+    _lastHoverTarget:null,_lastHoverDist:0,
+    rawPinchDist:1,  // Track pinch distance for instant detection
+    _palmStart:0,     // Timestamp when palm gesture first detected
+    _palmFired:false, // Prevents repeated palm triggers
+    theme:'dark',     // 'dark' or 'light'
+    mouseOver:false,
+    lastPinch:0,hovered:null,trail:[],currentApp:null,obStep:0,
+    gestureTarget:null,  // Currently hovered gesture-clickable element (sidebar, buttons, etc.)
+    pinchLockTarget:null, // Gesture target locked when pinch starts (prevents cursor drift losing target)
+    pinchLockHover:null,  // App grid hover locked when pinch starts
+    frame:0,
+    // Virtual keyboard
+    vkText:'',vkShift:false,vkHoveredKey:null,
+    vkLockedKey:null,         // Key locked in for pinch selection (prevents cursor drift changing key mid-pinch)
+    vkHoverStart:0,          // Timestamp when current key was first hovered (dwell requirement)
+    vkPinchActive:false,     // True while a pinch is in progress
+    // Music app state
+    musicPlaying:false,musicCurrent:0,musicProgress:0,musicTimer:null,
+    // Messenger state
+    msgChatOpen:false,msgInput:'',
+    // AI state
+    aiLoading:false,aiTypingEl:null,
+    _voiceActive:false, // True when voice command triggered processCmd (prevents double AI feedback)
+};
+
+// ═══════════════════════════════════════════
+// SPATIAL SOUND ENGINE — Web Audio API
+// ═══════════════════════════════════════════
+let _audioCtx=null;
+function getAudioCtx(){if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();return _audioCtx;}
+
+function playSound(type){
+    try{
+        const ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();
+        const now=ctx.currentTime;
+        switch(type){
+            case'hover':{ // Soft high ping
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(1800,now);o.frequency.exponentialRampToValueAtTime(1200,now+0.06);
+                g.gain.setValueAtTime(0.03,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.08);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.08);break;
+            }
+            case'click':{ // Crisp pinch snap
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(600,now);o.frequency.exponentialRampToValueAtTime(200,now+0.1);
+                g.gain.setValueAtTime(0.08,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.12);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.12);
+                // Add click layer
+                const o2=ctx.createOscillator(),g2=ctx.createGain();
+                o2.type='square';o2.frequency.setValueAtTime(2400,now);
+                g2.gain.setValueAtTime(0.02,now);g2.gain.exponentialRampToValueAtTime(0.001,now+0.03);
+                o2.connect(g2);g2.connect(ctx.destination);o2.start(now);o2.stop(now+0.03);break;
+            }
+            case'open':{ // Rising whoosh
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(300,now);o.frequency.exponentialRampToValueAtTime(900,now+0.2);
+                g.gain.setValueAtTime(0.05,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.25);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.25);break;
+            }
+            case'close':{ // Falling whoosh
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(800,now);o.frequency.exponentialRampToValueAtTime(200,now+0.18);
+                g.gain.setValueAtTime(0.04,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.22);break;
+            }
+            case'key':{ // Tiny holographic tap
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(2200,now);o.frequency.exponentialRampToValueAtTime(1600,now+0.04);
+                g.gain.setValueAtTime(0.025,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.06);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.06);break;
+            }
+            case'voice':{ // AI activation hum
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='sine';o.frequency.setValueAtTime(440,now);o.frequency.exponentialRampToValueAtTime(660,now+0.15);
+                g.gain.setValueAtTime(0.04,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.2);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.2);break;
+            }
+            case'mode':{ // Mode transition sweep
+                const o=ctx.createOscillator(),g=ctx.createGain();
+                o.type='triangle';o.frequency.setValueAtTime(400,now);o.frequency.exponentialRampToValueAtTime(1200,now+0.15);o.frequency.exponentialRampToValueAtTime(600,now+0.3);
+                g.gain.setValueAtTime(0.04,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.35);
+                o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.35);break;
+            }
+        }
+    }catch(e){}
+}
+let _lastHoverSound=0;
+
+// ═══════════════════════════════════════════
+// PHANTOM AI — Real AI via Featherless (Qwen3 + GLM-5 ready)
+// ═══════════════════════════════════════════
+const PHANTOM_AI={
+    endpoint:'https://api.featherless.ai/v1/chat/completions',
+    // Tiered models: chat = fast conversational, system = ultra-fast action feedback
+    models:{
+        chat:'Qwen/Qwen3-8B',              // ⚡ Best speed/quality for real-time chat
+        system:'Qwen/Qwen3-1.7B',          // ⚡⚡ Ultra-fast for system action feedback
+        quality:'Qwen/Qwen3-235B-A22B',    // 🏆 Premium quality (MoE, only 22B active)
+        // Other options on Featherless:
+        // 'zai-org/GLM-5'          — 754B flagship, slower but powerful
+        // 'zai-org/GLM-4.7-Flash'  — Fast GLM variant
+        // 'deepseek-ai/DeepSeek-V4-Flash' — Frontier-level, fast MoE
+    },
+    activeModel:'chat', // 'chat' | 'system' | 'quality'
+    history:[],
+    maxHistory:20,
+    systemPrompt:`You are PHANTOM AI — the intelligent, futuristic spatial assistant inside PHANTOM OS. You are sleek, cinematic, and minimal.
+
+RULES:
+- Respond concisely: 1-2 short sentences max. Be brief and immersive.
+- Use a futuristic, calm, intelligent tone. Like a sci-fi AI assistant.
+- Never break character. You ARE the OS assistant.
+- For system commands (opening apps, changing modes, navigating), acknowledge briefly and cinematically.
+- For questions, answer directly and concisely.
+- For unknown inputs, give a short helpful suggestion.
+- Use <em>tags</em> for emphasis on key words (like app names, modes).
+- Never use markdown formatting, code blocks, or long paragraphs.
+- If the user seems to want a system action, suggest the voice command.
+- Available apps: Browser, Messages, Music, Calendar, Notes, Settings.
+- Available modes: Productivity, Entertainment, Focus, Spatial Typing, AI Assistant.
+- Available voice commands: "open [app]", "go home", "focus mode", "light mode", "dark mode", "play music", "typing mode".`
+};
+
+// Send message to AI and get response
+async function aiChat(userMsg,opts={}){
+    if(S.aiLoading)return null;
+    S.aiLoading=true;
+
+    // Add to history
+    PHANTOM_AI.history.push({role:'user',content:userMsg});
+    if(PHANTOM_AI.history.length>PHANTOM_AI.maxHistory)PHANTOM_AI.history.shift();
+
+    const modelKey=opts.model||PHANTOM_AI.activeModel;
+    const model=PHANTOM_AI.models[modelKey]||PHANTOM_AI.models.chat;
+
+    try{
+        const messages=[{role:'system',content:PHANTOM_AI.systemPrompt},...PHANTOM_AI.history];
+        const ctrl=new AbortController();
+        const timeout=setTimeout(()=>ctrl.abort(),12000); // 12s timeout for full responses
+
+        const res=await fetch(PHANTOM_AI.endpoint,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            signal:ctrl.signal,
+            body:JSON.stringify({
+                model,
+                messages,
+                max_tokens:300,
+                temperature:0.7,
+                stream:false
+            })
+        });
+        clearTimeout(timeout);
+
+        if(!res.ok)throw new Error('API '+res.status);
+        const data=await res.json();
+        const reply=data.choices?.[0]?.message?.content?.trim();
+        if(!reply)throw new Error('Empty response');
+
+        // Check if response was truncated (finish_reason = 'length')
+        const finishReason=data.choices?.[0]?.finish_reason;
+        let finalReply=reply;
+        if(finishReason==='length'){
+            // Try to complete the thought by removing trailing incomplete sentence
+            const lastPeriod=finalReply.lastIndexOf('.');
+            const lastBang=finalReply.lastIndexOf('!');
+            const lastQ=finalReply.lastIndexOf('?');
+            const lastPunct=Math.max(lastPeriod,lastBang,lastQ);
+            if(lastPunct>finalReply.length*0.5){
+                finalReply=finalReply.substring(0,lastPunct+1);
+            }
+        }
+
+        // Save assistant response to history
+        PHANTOM_AI.history.push({role:'assistant',content:finalReply});
+        if(PHANTOM_AI.history.length>PHANTOM_AI.maxHistory)PHANTOM_AI.history.shift();
+
+        return finalReply;
+    }catch(e){
+        if(e.name==='AbortError'){
+            console.warn('PHANTOM AI: Request timed out');
+        }else{
+            console.warn('PHANTOM AI:',e.message);
+        }
+        return null; // Will trigger fallback
+    }finally{
+        S.aiLoading=false;
+    }
+}
+
+// System action feedback — short AI commentary on actions
+async function aiSystemFeedback(action,context){
+    if(S.aiLoading)return; // Don't queue if already processing
+    const prompt=`[System action: ${action}. ${context||''}] Respond with a single short cinematic line acknowledging this.`;
+    // Use ultra-fast system model for snappy feedback
+    const model=PHANTOM_AI.models.system;
+    try{
+        const messages=[{role:'system',content:PHANTOM_AI.systemPrompt},{role:'user',content:prompt}];
+        const ctrl=new AbortController();
+        const timeout=setTimeout(()=>ctrl.abort(),3000); // Shorter timeout for system feedback
+        const res=await fetch(PHANTOM_AI.endpoint,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            signal:ctrl.signal,
+            body:JSON.stringify({
+                model,
+                messages,
+                max_tokens:60,
+                temperature:0.8,
+                stream:false
+            })
+        });
+        clearTimeout(timeout);
+        if(!res.ok)throw new Error('API '+res.status);
+        const data=await res.json();
+        const reply=data.choices?.[0]?.message?.content?.trim();
+        if(reply)addMsg('bot',reply);
+    }catch(e){
+        // Silently use fallback — no console spam for system feedback
+        const fallback=sysFallback(action,context);
+        if(fallback)addMsg('bot',fallback);
+    }
+}
+
+// Show/hide typing indicator
+function showTypingIndicator(){
+    if(S.aiTypingEl)return;
+    const el=document.createElement('div');
+    el.className='msg bot';
+    el.id='aiTyping';
+    el.innerHTML='<span class="ai-typing-dots"><span></span><span></span><span></span></span>';
+    $('#aiMsgs').appendChild(el);
+    $('#aiMsgs').scrollTop=$('#aiMsgs').scrollHeight;
+    S.aiTypingEl=el;
+    // Update AI status indicator to show active model
+    const st=document.querySelector('.ai-st');
+    if(st){
+        const m=PHANTOM_AI.activeModel;
+        const label=m==='quality'?'Qwen3-235B':m==='system'?'Qwen3-1.7B':'Qwen3-4B';
+        st.textContent='Thinking... · '+label;st.style.color='var(--amber)';
+    }
+}
+function removeTypingIndicator(){
+    if(S.aiTypingEl){S.aiTypingEl.remove();S.aiTypingEl=null;}
+    // Restore AI status indicator with active model
+    const st=document.querySelector('.ai-st');
+    if(st){
+        const m=PHANTOM_AI.activeModel;
+        const label=m==='quality'?'Qwen3-235B':m==='system'?'Qwen3-1.7B':'Qwen3';
+        st.textContent='Online \u00b7 '+label;st.style.color='var(--green)';
+    }
+}
+
+const MODES={productivity:{label:'Productivity Mode',accent:'var(--cyan)'},entertainment:{label:'Entertainment Mode',accent:'var(--pink)'},focus:{label:'Focus Mode',accent:'var(--green)'},spatial_typing:{label:'Spatial Typing Mode',accent:'var(--purple)'},ai_assistant:{label:'AI Assistant Mode',accent:'var(--amber)'}};
+const APPS=[{id:'browser',icon:'fa-globe',label:'Browser',color:'var(--cyan)'},{id:'messages',icon:'fa-comment',label:'Messages',color:'var(--pink)'},{id:'music',icon:'fa-headphones',label:'Music',color:'var(--purple)'},{id:'calendar',icon:'fa-calendar',label:'Calendar',color:'var(--green)'},{id:'notes',icon:'fa-file-lines',label:'Notes',color:'var(--amber)'},{id:'settings',icon:'fa-gear',label:'Settings',color:'var(--muted)'}];
+const GL={pointing:'Move',pinch:'Click',open_palm:'Home',two_fingers:'Scroll',fist:'Grab',none:'',unknown:''};
+
+// ═══════════════════════════════════════════
+// VIRTUAL KEYBOARD
+// ═══════════════════════════════════════════
+const KB_ROWS=[
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['SHIFT','Z','X','C','V','B','N','M','BKSP'],
+    ['123','SPACE','.','ENTER']
+];
+const KB_NUM_ROWS=[
+    ['1','2','3','4','5','6','7','8','9','0'],
+    ['-','/',':',';','(',')','$','&','@','"'],
+    ['ABC','.',',','?','!','\'','BKSP'],
+    ['ABC','SPACE','ENTER']
+];
+let kbNumMode=false;
+let vkKeyEls=[];
+
+function buildKeyboard(){
+    const kb=$('#vkKeyboard');kb.innerHTML='';vkKeyEls=[];
+    const rows=kbNumMode?KB_NUM_ROWS:KB_ROWS;
+    rows.forEach(row=>{
+        const rowEl=document.createElement('div');rowEl.className='vk-row';
+        row.forEach(k=>{
+            const key=document.createElement('div');
+            key.className='vk-key';
+            key.dataset.key=k;
+            if(k==='SHIFT'||k==='ABC'||k==='123')key.classList.add('vk-special');
+            if(k==='SPACE')key.classList.add('vk-space');
+            if(k==='BKSP')key.classList.add('vk-special');
+            if(k==='ENTER')key.classList.add('vk-special');
+            // Display labels
+            let label=k;
+            if(k==='SHIFT')label='⇧ SHIFT';
+            if(k==='BKSP')label='⌫';
+            if(k==='SPACE')label='SPACE';
+            if(k==='ENTER')label='↵ ENTER';
+            if(k==='123')label='123';
+            if(k==='ABC')label='ABC';
+            key.textContent=label;
+            key.addEventListener('mousedown',e=>{e.stopPropagation();vkKeyPress(k);key.classList.add('vk-pressed');setTimeout(()=>key.classList.remove('vk-pressed'),150);});
+            key.addEventListener('mouseenter',()=>{
+                // Clear previous hover
+                vkKeyEls.forEach(vk=>vk.el.classList.remove('vk-hover'));
+                key.classList.add('vk-hover');
+                S.vkHoveredKey=k;
+            });
+            key.addEventListener('mouseleave',()=>{
+                key.classList.remove('vk-hover');
+                if(S.vkHoveredKey===k) S.vkHoveredKey=null;
+            });
+            rowEl.appendChild(key);
+            vkKeyEls.push({el:key,key:k});
+        });
+        kb.appendChild(rowEl);
+    });
+}
+
+function vkKeyPress(k){
+    playSound('key');
+    if(k==='SHIFT'){
+        S.vkShift=!S.vkShift;
+        updateShiftVisual();
+        return;
+    }
+    if(k==='123'){kbNumMode=true;buildKeyboard();return;}
+    if(k==='ABC'){kbNumMode=false;buildKeyboard();return;}
+    if(k==='BKSP'){
+        S.vkText=S.vkText.slice(0,-1);
+        updateVkDisplay();
+        deliverKeyToApp('Backspace');
+        return;
+    }
+    if(k==='SPACE'){
+        S.vkText+=' ';
+        updateVkDisplay();
+        deliverKeyToApp(' ');
+        return;
+    }
+    if(k==='ENTER'){
+        handleVkEnter();
+        return;
+    }
+    // Regular character
+    let ch=S.vkShift?k:k.toLowerCase();
+    S.vkText+=ch;
+    S.vkShift=false;
+    updateShiftVisual();
+    updateVkDisplay();
+    deliverKeyToApp(ch);
+}
+
+function updateShiftVisual(){
+    vkKeyEls.forEach(k=>{
+        if(k.key==='SHIFT'){
+            k.el.classList.toggle('vk-shift-active',S.vkShift);
+        }
+    });
+}
+
+function updateVkDisplay(){
+    const el=$('#vkText');
+    el.textContent=S.vkText;
+    // Scroll text display to end
+    const td=$('#vkTextDisplay');
+    td.scrollLeft=td.scrollWidth;
+}
+
+function handleVkEnter(){
+    const text=S.vkText.trim();
+    if(!text)return;
+    // If in an app context, deliver the text
+    if(S.currentApp==='notes'){
+        const editor=document.getElementById('noteEditor');
+        if(editor){editor.value+=text+'\n';}
+        S.vkText='';updateVkDisplay();return;
+    }
+    if(S.currentApp==='messages'){
+        addMsgBubble(text,'sent');
+        S.vkText='';updateVkDisplay();
+        // Simulate reply after delay
+        setTimeout(()=>{
+            const replies=['Got it!','Sounds good 👍','On my way!','Sure thing!','Let me check...','That works!','Awesome!','I\'ll be there!'];
+            addMsgBubble(replies[Math.floor(Math.random()*replies.length)],'recv');
+        },1200+Math.random()*1000);
+        return;
+    }
+    if(S.currentApp==='browser'){
+        const urlInput=document.getElementById('brUrlInput');
+        if(urlInput){urlInput.value=text;navigateTo(text);}
+        S.vkText='';updateVkDisplay();return;
+    }
+    // Default: send as AI command
+    processCmd(text);
+    S.vkText='';updateVkDisplay();
+}
+
+function deliverKeyToApp(ch){
+    if(S.currentApp==='notes'){
+        const editor=document.getElementById('noteEditor');
+        if(editor&&ch!=='Backspace'){
+            // Insert at cursor position
+            const start=editor.selectionStart,end=editor.selectionEnd;
+            editor.value=editor.value.substring(0,start)+ch+editor.value.substring(end);
+            editor.selectionStart=editor.selectionEnd=start+ch.length;
+        }else if(editor&&ch==='Backspace'){
+            const start=editor.selectionStart;
+            if(start>0){
+                editor.value=editor.value.substring(0,start-1)+editor.value.substring(start);
+                editor.selectionStart=editor.selectionEnd=start-1;
+            }
+        }
+    }
+}
+
+function checkVkHover(cx,cy){
+    // If a pinch is active, lock the key — don't change hover during pinch
+    // (prevents cursor drift when thumb+index come together from selecting wrong key)
+    if(S.vkPinchActive && S.vkLockedKey) return;
+
+    let found=null;
+    const cR=$('#centerArea').getBoundingClientRect();
+    const now=Date.now();
+    // Use expanded hit areas (12px padding) for easier targeting with hand tracking
+    const pad=12;
+    for(const k of vkKeyEls){
+        const r=k.el.getBoundingClientRect();
+        const rx=r.left-cR.left-pad, ry=r.top-cR.top-pad;
+        const rw=r.width+pad*2, rh=r.height+pad*2;
+        if(cx>=rx&&cx<=rx+rw&&cy>=ry&&cy<=ry+rh){
+            found=k;
+            break; // Only highlight the first (top-most) match
+        }
+    }
+    // Update hover visuals
+    for(const k of vkKeyEls){
+        const isHovered=found&&k.key===found.key;
+        const wasHovered=k.el.classList.contains('vk-hover');
+        k.el.classList.toggle('vk-hover',isHovered);
+        // Dwell indicator: key has been hovered for 120ms+ (ready for pinch)
+        if(isHovered && !wasHovered){
+            S.vkHoverStart=now;
+            k.el.classList.remove('vk-dwell');
+        }
+        if(isHovered && (now-S.vkHoverStart>120)){
+            k.el.classList.add('vk-dwell');
+        }else{
+            k.el.classList.remove('vk-dwell');
+        }
+    }
+    // Remove pressed state from all keys
+    vkKeyEls.forEach(k=>k.el.classList.remove('vk-pressed'));
+    const newKey=found?found.key:null;
+    if(newKey!==S.vkHoveredKey) S.vkHoverStart=now; // Reset dwell timer on key change
+    S.vkHoveredKey=newKey;
+}
+
+// ═══════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════
+const obSteps=$$('.ob-step');const obDotsEl=$('#obDots');
+for(let i=0;i<obSteps.length;i++){const d=document.createElement('div');d.className='ob-dot'+(i===0?' active':'');obDotsEl.appendChild(d);}
+function obNext(){S.obStep++;if(S.obStep>=obSteps.length){obFinish();return;}obSteps.forEach(s=>s.classList.remove('active'));obSteps[S.obStep].classList.add('active');$$('.ob-dot').forEach((d,i)=>d.classList.toggle('active',i===S.obStep));}
+function obFinish(){$('#onboarding').classList.add('done');}
+function showOb(){S.obStep=0;obSteps.forEach(s=>s.classList.remove('active'));obSteps[0].classList.add('active');$$('.ob-dot').forEach((d,i)=>d.classList.toggle('active',i===0));$('#onboarding').classList.remove('done');}
+
+// ═══════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════
+async function boot(){const bL=$('#bLogo'),bS=$('#bSub'),bD=$('#bDiv'),bLog=$('#bLog'),bBW=$('#bBarW'),bB=$('#bBar');bL.classList.add('show');await sleep(700);bS.classList.add('show');await sleep(450);bD.classList.add('show');await sleep(400);bBW.classList.add('show');const lines=['Initializing neural hand tracking...','Loading spatial keyboard...','Calibrating voice interface...','Preparing virtual input...','Connecting to neural AI core...','System ready.'];for(let i=0;i<lines.length;i++){const el=document.createElement('div');el.className='b-line';el.textContent=lines[i];bLog.appendChild(el);await sleep(60);el.classList.add('show');bB.style.width=((i+1)/lines.length*100)+'%';await sleep(320);}await sleep(600);$('#bootScreen').classList.add('done');$('#mainApp').classList.add('show');init();}
+
+function init(){
+    resize();
+    S.sx=innerWidth/2;S.sy=innerHeight/2;
+    buildKeyboard();
+    initAtmo();buildAppGrid();initVoice();setupListeners();
+    requestAnimationFrame(loop);
+}
+function resize(){const r=$('#centerArea').getBoundingClientRect();$('#overlayCanvas').width=r.width;$('#overlayCanvas').height=r.height;$('#atmosCanvas').width=r.width;$('#atmosCanvas').height=r.height;gridDirty=true;}
+window.addEventListener('resize',resize);
+
+// ═══════════════════════════════════════════
+// CAMERA
+// ═══════════════════════════════════════════
+async function requestCamera(){
+    if(S.camOn)return;const btn=$('#camBtn');if(btn.classList.contains('loading'))return;btn.classList.add('loading');
+    try{
+        if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('NOT_SUPPORTED');
+        const stream=await navigator.mediaDevices.getUserMedia({video:{width:PERF.camW,height:PERF.camH,facingMode:'user'}});
+        const wc=$('#webcam');wc.srcObject=stream;
+        await new Promise((res,rej)=>{wc.onloadedmetadata=()=>{wc.play();res();};setTimeout(()=>rej(new Error('TIMEOUT')),8000);});
+        wc.classList.add('on');S.camOn=true;$('#dCam').className='dot on';btn.classList.remove('loading');btn.classList.add('on');btn.innerHTML='<i class="fa-solid fa-video"></i>';btn.title='Camera active';
+        toast('Camera enabled!','ok');addMsg('bot','Camera active! Show your hand to control the cursor.');
+        startMP(wc);
+    }catch(e){btn.classList.remove('loading');btn.classList.remove('on');$('#dCam').className='dot err';$('#camErrorPopup').classList.add('show');}
+}
+
+async function startMP(wc){
+    try{
+        const hI=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+        hI.setOptions({maxNumHands:1,modelComplexity:PERF.mpComplexity,minDetectionConfidence:PERF.mpDetectConf,minTrackingConfidence:PERF.mpTrackConf,smoothLandmarks:true,smoothFactor:0.4});
+        hI.onResults(onHands);
+        const cI=new Camera(wc,{onFrame:async()=>{if(S.processing)return;S.processing=true;try{await hI.send({image:wc});}catch(e){S.processing=false;}},width:PERF.camW,height:PERF.camH});
+        cI.start();S.mpReady=true;$('#dHand').className='dot on';toast('Hand tracking loaded','ok');
+    }catch(e){console.warn(e);toast('Hand tracking failed','err');}
+}
+
+// ═══════════════════════════════════════════
+// ATMOSPHERE
+// ═══════════════════════════════════════════
+let aParts=[],gridCanvas=null,gridDirty=true;
+function initAtmo(){aParts=[];for(let i=0;i<PERF.particles;i++)aParts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,r:Math.random()*1+.3,a:Math.random()*.08+.02});}
+
+function drawAtmo(){
+    // Skip atmospheric drawing on some frames for mobile performance
+    if(PERF.particleDraw>0 && S.frame%PERF.particleDraw!==0) return;
+    const c=$('#atmosCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+    if(PERF.drawGrid){
+        if(gridDirty||!gridCanvas||gridCanvas.width!==w||gridCanvas.height!==h){
+            gridCanvas=document.createElement('canvas');gridCanvas.width=w;gridCanvas.height=h;
+            const gc=gridCanvas.getContext('2d');
+            const gridColor=S.theme==='light'?'rgba(0,102,238,.02)':'rgba(0,212,255,.012)';
+            gc.strokeStyle=gridColor;gc.lineWidth=1;
+            const gs=60;for(let x=0;x<w;x+=gs){gc.beginPath();gc.moveTo(x,0);gc.lineTo(x,h);gc.stroke();}for(let y=0;y<h;y+=gs){gc.beginPath();gc.moveTo(0,y);gc.lineTo(w,y);gc.stroke();}
+            gridDirty=false;
+        }
+        ctx.drawImage(gridCanvas,0,0);
+    }
+    if(PERF.drawRadial){
+        const mc=S.mode==='focus'?'34,197,94':S.mode==='entertainment'?'244,114,182':S.mode==='spatial_typing'?'139,92,246':S.mode==='ai_assistant'?'245,158,11':'0,212,255';
+        const rg=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.4);rg.addColorStop(0,`rgba(${mc},.02)`);rg.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);
+    }
+    for(const p of aParts){
+        p.x+=p.vx;p.y+=p.vy;const dx=S.sx-p.x,dy=S.sy-p.y,d=Math.hypot(dx,dy);
+        if(d<120&&d>1){p.vx+=dx/d*.001;p.vy+=dy/d*.001;}
+        p.vx*=.998;p.vy*=.998;
+        if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+        const pc=S.theme==='light'?'0,102,238':'0,212,255';
+        ctx.beginPath();ctx.arc(p.x,p.y,Math.max(.3,p.r),0,Math.PI*2);ctx.fillStyle=`rgba(${pc},${p.a})`;ctx.fill();
+    }
+}
+
+// ═══════════════════════════════════════════
+// HAND RESULTS — improved smoothing & gesture stability
+// ═══════════════════════════════════════════
+let lastLM=null;
+
+function onHands(res){
+    S.processing=false;
+    if(res.multiHandLandmarks&&res.multiHandLandmarks.length>0){
+        const lm=res.multiHandLandmarks[0];lastLM=lm;S.handOn=true;
+        const t=lm[4],it=lm[8]; // thumb tip, index tip
+        const pd=Math.hypot(t.x-it.x,t.y-it.y,t.z-it.z);
+        S.rawPinchDist=pd;
+
+        // ── CURSOR POSITION: Index tip when pointing, midpoint when pinching ──
+        // When pinching, the user's intent is at the pinch point (between thumb+index)
+        // This prevents the cursor from jumping to a wrong finger during pinch
+        if(pd<0.085){
+            // Pinch or near-pinch: use midpoint between thumb and index
+            S.rawX=(1-(t.x+it.x)/2)*innerWidth;
+            S.rawY=((t.y+it.y)/2)*innerHeight;
+        }else{
+            // Normal: use index fingertip only
+            S.rawX=(1-it.x)*innerWidth;
+            S.rawY=it.y*innerHeight;
+        }
+
+        const g=classify(lm);
+        // Gesture history (3) for stable recognition
+        S.gestureHistory.push(g);if(S.gestureHistory.length>3)S.gestureHistory.shift();
+        S.prevGesture=S.stableGesture;
+        // INSTANT PINCH: If pinch distance is very small, recognize immediately
+        if(pd<0.045){
+            S.stableGesture='pinch';  // Override majority vote for very tight pinch
+        }else{
+            S.stableGesture=majorityVote(S.gestureHistory);
+        }
+        S.gesture=g;
+        const sw=detSwipe(lm);if(sw)hSwipe(sw);
+        hTrans();
+    }else{
+        S.handOn=false;lastLM=null;S.gestureHistory=[];S.stableGesture='none';S.gesture='none';S.processing=false;S.rawPinchDist=1;
+    }
+}
+
+function majorityVote(arr){
+    const counts={};for(const g of arr){counts[g]=(counts[g]||0)+1;}
+    let best='',max=0;for(const[g,c]of Object.entries(counts)){if(c>max){max=c;best=g;}}
+    return best;
+}
+
+function classify(lm){
+    const t=lm[4],i=lm[8],m=lm[12],r=lm[16],p=lm[20],ip=lm[6],mp=lm[10],rp=lm[14],pp=lm[18],im=lm[5];
+    const iE=i.y<ip.y,mE=m.y<mp.y,rE=r.y<rp.y,pE=p.y<pp.y,tE=Math.hypot(t.x-im.x,t.y-im.y)>.08;
+    const pd=Math.hypot(t.x-i.x,t.y-i.y);
+    // Hysteresis for pinch: need threshold (0.07) to ENTER pinch,
+    // but looser threshold (0.095) to EXIT — prevents rapid flicker in/out
+    // Wider enter threshold = easier to trigger pinch = less frustration
+    if(S.stableGesture==='pinch'){
+        if(pd<0.095)return'pinch'; // Stay in pinch while still close
+    }else{
+        if(pd<0.07)return'pinch'; // Enter pinch easier
+    }
+    if(iE&&!mE&&!rE&&!pE)return'pointing';
+    if(iE&&mE&&!rE&&!pE)return'two_fingers';
+    // Open palm — hysteresis for stability
+    // Entering palm: at least 3 of 4 fingers extended (more forgiving)
+    // Staying in palm: at least 2 of 4 fingers still up
+    const fingersUp=(iE?1:0)+(mE?1:0)+(rE?1:0)+(pE?1:0);
+    if(S.stableGesture==='open_palm'){
+        if(fingersUp>=2)return'open_palm'; // Stay: easier to maintain
+    }else{
+        if(fingersUp>=3&&tE)return'open_palm'; // Enter: 3+ fingers + thumb
+    }
+    if(!iE&&!mE&&!rE&&!pE)return'fist';
+    return'unknown';
+}
+
+function detSwipe(lm){const w=lm[0],now=Date.now();if(!S._swipeHist)S._swipeHist=[];S._swipeHist.push({x:w.x,y:w.y,t:now});S._swipeHist=S._swipeHist.filter(p=>now-p.t<450);if(S._swipeHist.length>5){const f=S._swipeHist[0],l=S._swipeHist[S._swipeHist.length-1],dx=l.x-f.x,dt=l.t-f.t;if(dt<400&&Math.abs(dx)>.14&&Math.abs(dx)>Math.abs(l.y-f.y)*1.5){S._swipeHist=[];return dx>0?'swipe_left':'swipe_right';}}return null;}
+function hSwipe(sw){if(S.currentApp){goHome();showAction('Home','var(--green)');return;}const k=Object.keys(MODES),idx=k.indexOf(S.mode);setMode(sw==='swipe_right'?k[(idx+1)%k.length]:k[(idx-1+k.length)%k.length]);toast(MODES[S.mode].label,'info');showAction('Mode: '+MODES[S.mode].label,'var(--cyan)');}
+
+function hTrans(){
+    const g=S.stableGesture,pg=S.prevGesture;
+    if(S.frame%3===0){
+        $('#cLabel').textContent=GL[g]||'';
+        $('#gLabel').textContent=g.replace(/_/g,' ').toUpperCase();
+        $$('.hint-item').forEach(h=>h.classList.remove('active-hint'));
+        if(g==='pointing')$$('.hint-item[data-hint="point"]').forEach(h=>h.classList.add('active-hint'));
+        if(g==='pinch')$$('.hint-item[data-hint="pinch"]').forEach(h=>h.classList.add('active-hint'));
+        if(g==='open_palm')$$('.hint-item[data-hint="palm"]').forEach(h=>h.classList.add('active-hint'));
+        if(S.handOn){$('#dHand').className='dot on';$('#trackInd').classList.add('on');}
+        else{$('#dHand').className=S.mpReady?'dot off':'dot err';$('#trackInd').classList.remove('on');}
+    }
+    // ── PINCH START: Lock targets so cursor drift doesn't lose them ──
+    if(g==='pinch'&&pg!=='pinch'){
+        playSound('click');
+        // Lock keyboard key (if in spatial typing mode)
+        if(S.mode==='spatial_typing'&&S.vkHoveredKey){
+            S.vkLockedKey=S.vkHoveredKey;
+            S.vkPinchActive=true;
+            const lk=vkKeyEls.find(k=>k.key===S.vkLockedKey);
+            if(lk){lk.el.classList.remove('vk-hover');lk.el.classList.add('vk-locked');}
+        }
+        // Lock gesture target (sidebar buttons, music rows, contacts, etc.)
+        if(S.gestureTarget){
+            S.pinchLockTarget=S.gestureTarget;
+            // Add locked visual to the element
+            S.pinchLockTarget.el.classList.add('glow');
+        }
+        // Lock app grid hover
+        if(S.hovered){
+            S.pinchLockHover=S.hovered;
+        }
+        const now=Date.now();if(now-S.lastPinch>180){  // 180ms debounce for rapid clicking
+            S.lastPinch=now;
+            // If in spatial typing mode and a key is locked, press it
+            if(S.mode==='spatial_typing'&&S.vkLockedKey){
+                vkKeyPress(S.vkLockedKey);
+                const hk=vkKeyEls.find(k=>k.key===S.vkLockedKey);
+                if(hk){hk.el.classList.remove('vk-locked');hk.el.classList.add('vk-pressed');setTimeout(()=>hk.el.classList.remove('vk-pressed'),150);}
+                gpulse(S.sx,S.sy,'var(--purple)');
+            }else{
+                doPinch();
+            }
+        }
+    }
+    // ── PINCH END: Release all locks ──
+    if(g!=='pinch'&&pg==='pinch'){
+        S.vkPinchActive=false;
+        if(S.vkLockedKey){
+            const lk=vkKeyEls.find(k=>k.key===S.vkLockedKey);
+            if(lk)lk.el.classList.remove('vk-locked');
+            S.vkLockedKey=null;
+        }
+        // Clear gesture target lock
+        if(S.pinchLockTarget){
+            S.pinchLockTarget.el.classList.remove('glow');
+            S.pinchLockTarget=null;
+        }
+        S.pinchLockHover=null;
+    }
+    const cur=$('#phantomCursor');
+    if(g==='open_palm'){
+        // Require palm to be held for 250ms to avoid accidental "go home"
+        if(!S._palmStart)S._palmStart=Date.now();
+        const palmProgress=Math.min(1,(Date.now()-S._palmStart)/250);
+        // Visual: expand cursor ring as palm hold progresses
+        const palmRing=cur.querySelector('.c-ring');
+        if(palmRing&&!S._palmFired){
+            const s=28+palmProgress*24; // Grow from 28px to 52px
+            palmRing.style.width=s+'px';palmRing.style.height=s+'px';
+            palmRing.style.top=((28-s)/2)+'px';palmRing.style.left=((28-s)/2)+'px';
+            palmRing.style.borderColor=`rgba(0,212,255,${0.3+palmProgress*0.7})`;
+        }
+        if(S._palmStart&&!S._palmFired&&Date.now()-S._palmStart>250){doPalm();S._palmFired=true;S._palmStart=0;}
+    }else{S._palmStart=0;S._palmFired=false;
+        // Reset palm visual on cursor ring
+        const palmRing=cur.querySelector('.c-ring');
+        if(palmRing){palmRing.style.width='';palmRing.style.height='';palmRing.style.top='';palmRing.style.left='';palmRing.style.borderColor='';}
+    }
+    cur.className=S.handOn?'vis':'';
+    if(g==='pinch')cur.classList.add('pinching');else if(g==='open_palm')cur.classList.add('palm');else if(g==='pointing')cur.classList.add('point');
+    // Pinch proximity indicator — show progress bar when fingers are getting close
+    if(S.rawPinchDist<0.12 && g!=='pinch'){
+        cur.classList.add('near-pinch');
+        const progress=Math.max(0,Math.min(100,((0.12-S.rawPinchDist)/0.05)*100));
+        const fill=$('#cPinchFill');if(fill)fill.style.width=progress+'%';
+    }else{
+        cur.classList.remove('near-pinch');
+        const fill=$('#cPinchFill');if(fill)fill.style.width='0%';
+    }
+}
+
+function doPinch(){
+    playSound('click');
+    gpulse(S.sx,S.sy,'var(--purple)');showAction('Click','var(--purple)');
+    // Priority 1: Locked gesture target (from pinch start — survives cursor drift)
+    if(S.pinchLockTarget){
+        S.pinchLockTarget.action();
+        S.pinchLockTarget.el.classList.remove('glow');
+        S.pinchLockTarget=null;
+        S.gestureTarget=null;
+        return;
+    }
+    // Priority 2: Current gesture target (if lock wasn't set)
+    if(S.gestureTarget){
+        S.gestureTarget.action();
+        S.gestureTarget=null;
+        return;
+    }
+    // Priority 3: Locked app grid hover (from pinch start)
+    if(S.pinchLockHover){openApp(S.pinchLockHover);S.pinchLockHover=null;S.hovered=null;return;}
+    // Priority 4: Current app grid hover
+    if(S.hovered){openApp(S.hovered);S.hovered=null;}
+}
+function doPalm(){gpulse(S.sx,S.sy,'var(--cyan)');if(S.currentApp){goHome();showAction('Home','var(--green)');}else showAction('Home','var(--green)');}
+function gpulse(x,y,c){const el=document.createElement('div');el.className='g-pulse';el.style.cssText=`position:fixed;left:${x}px;top:${y}px;border-color:${c};z-index:10021;`;document.body.appendChild(el);setTimeout(()=>el.remove(),550);}
+function showAction(text,color){const el=document.createElement('div');el.className='action-fb';el.style.cssText=`position:fixed;left:${S.sx}px;top:${S.sy}px;color:${color};background:${color}12;border:1px solid ${color}18;z-index:10021;`;el.textContent=text;document.body.appendChild(el);setTimeout(()=>el.remove(),900);}
+
+// ═══════════════════════════════════════════
+// APP GRID
+// ═══════════════════════════════════════════
+let appItems=[];
+function buildAppGrid(){const grid=$('#appGrid');grid.innerHTML='';appItems=[];APPS.forEach(app=>{const el=document.createElement('div');el.className='app-item';el.dataset.id=app.id;el.innerHTML=`<div class="app-item-ic" style="color:${app.color}"><i class="fa-solid ${app.icon}"></i></div><div class="app-item-lb">${app.label}</div>`;
+el.addEventListener('click',(e)=>{e.stopPropagation();openApp(app.id);});
+grid.appendChild(el);appItems.push({el,app});});}
+
+// ═══════════════════════════════════════════
+// UNIVERSAL GESTURE HOVER — CACHED for performance
+// ═══════════════════════════════════════════
+let _cachedTargets=null;      // Cached gesture targets list
+let _targetsDirty=true;       // Set true when DOM changes (app open/close)
+let _cachedRects=null;        // Cached bounding rects
+let _rectsFrame=0;            // Frame when rects were last computed
+let lastHoveredEl=null;
+
+function markTargetsDirty(){_targetsDirty=true;_cachedTargets=null;_cachedRects=null;}
+
+function getGestureTargets(){
+    // Return cached targets if DOM hasn't changed — avoids $$() and getElementById every frame
+    if(_cachedTargets && !_targetsDirty) return _cachedTargets;
+    const targets=[];
+    $$('.m-btn').forEach(el=>{targets.push({el, action:()=>setMode(el.dataset.mode), type:'mode'});});
+    const micTog=$('#micTog');
+    if(micTog) targets.push({el:micTog, action:()=>toggleVoice(), type:'mic'});
+    const helpBtn=$('#helpBtn');
+    if(helpBtn) targets.push({el:helpBtn, action:()=>showOb(), type:'help'});
+    const themeTog=$('#themeTog');
+    if(themeTog) targets.push({el:themeTog, action:()=>toggleTheme(), type:'theme'});
+    const camBtn=$('#camBtn');
+    if(camBtn) targets.push({el:camBtn, action:()=>requestCamera(), type:'cam'});
+    const backBtn=$('.back-btn');
+    if(backBtn && S.currentApp) targets.push({el:backBtn, action:()=>goHome(), type:'back'});
+    const aiSnd=$('#aiSnd');
+    if(aiSnd) targets.push({el:aiSnd, action:()=>sendAI(), type:'ai-snd'});
+    $$('.music-row').forEach(el=>{const idx=parseInt(el.id.replace('song',''));if(!isNaN(idx)) targets.push({el, action:()=>playSong(idx), type:'music-row'});});
+    const mainPlayBtn=document.getElementById('mainPlayBtn');
+    if(mainPlayBtn) targets.push({el:mainPlayBtn, action:()=>togglePlay(), type:'main-play'});
+    const prevBtn=document.getElementById('prevSongBtn');if(prevBtn) targets.push({el:prevBtn, action:()=>prevSong(), type:'prev-song'});
+    const nextBtn=document.getElementById('nextSongBtn');if(nextBtn) targets.push({el:nextBtn, action:()=>nextSong(), type:'next-song'});
+    $$('.msg-contact').forEach(el=>{targets.push({el, action:()=>openChat(el.dataset.contact||''), type:'msg-contact'});});
+    $$('.chat-back-btn').forEach(el=>{targets.push({el, action:()=>closeChat(), type:'chat-back'});});
+    $$('.br-bookmark').forEach(el=>{targets.push({el, action:()=>el.click(), type:'bookmark'});});
+    _cachedTargets=targets;
+    _targetsDirty=false;
+    _cachedRects=null;
+    return targets;
+}
+
+function getCachedRects(targets){
+    // Cache bounding rects — avoid getBoundingClientRect() every frame
+    if(_cachedRects && (S.frame-_rectsFrame)<PERF.rectCacheTTL) return _cachedRects;
+    const rects=targets.map(t=>{
+        const r=t.el.getBoundingClientRect();
+        // Bigger hit areas for easier gesture clicking — especially on mobile
+        const pad=t.type==='music-row'?16:t.type==='msg-contact'?16:t.type==='main-play'?18:t.type==='prev-song'?18:t.type==='next-song'?18:t.type==='cam'?16:14;
+        return {left:r.left-pad, right:r.right+pad, top:r.top-pad, bottom:r.bottom+pad, target:t};
+    });
+    _cachedRects=rects;
+    _rectsFrame=S.frame;
+    return rects;
+}
+
+function chkAllHover(pageX,pageY){
+    // During pinch: keep locked target, don't update
+    if(S.stableGesture==='pinch') return;
+    // Throttle hover checks — don't need every frame
+    if(S.frame%PERF.hoverThrottle!==0) return;
+
+    // ── HOVER HYSTERESIS: Stick to current target unless cursor moves significantly away ──
+    // Once a target is hovered, keep it until cursor is 8px outside its bounds
+    if(S._lastHoverTarget){
+        try{
+            const el=S._lastHoverTarget.el||S._lastHoverTarget;
+            if(el && el.getBoundingClientRect){
+                const r=el.getBoundingClientRect();
+                const pad=8;
+                // Still inside expanded bounds? Keep it.
+                if(pageX>=r.left-pad && pageX<=r.right+pad && pageY>=r.top-pad && pageY<=r.bottom+pad){
+                    // Still hovering the same target
+                    return;
+                }
+            }
+        }catch(e){}
+        // Left the sticky zone — clear it
+        if(lastHoveredEl)lastHoveredEl.classList.remove('glow');
+        lastHoveredEl=null;
+        S.gestureTarget=null;
+        S._lastHoverTarget=null;
+    }
+
+    if(lastHoveredEl){lastHoveredEl.classList.remove('glow');lastHoveredEl=null;}
+    S.gestureTarget=null;
+
+    // Check cached gesture targets with cached rects
+    const targets=getGestureTargets();
+    const rects=getCachedRects(targets);
+    for(const rc of rects){
+        if(pageX>=rc.left&&pageX<=rc.right&&pageY>=rc.top&&pageY<=rc.bottom){
+            rc.target.el.classList.add('glow');
+            lastHoveredEl=rc.target.el;
+            S.gestureTarget=rc.target;
+            S._lastHoverTarget=rc.target;
+            // Throttled hover sound
+            const now=Date.now();
+            if(now-_lastHoverSound>200){playSound('hover');_lastHoverSound=now;}
+            return;
+        }
+    }
+
+    // Check app grid items (only when no app is open)
+    if(!S.currentApp){
+        let h=null;
+        appItems.forEach(o=>{
+            const r=o.el.getBoundingClientRect();
+            // Bigger hit area (14px padding) for easier gesture targeting
+            if(pageX>=r.left-14&&pageX<=r.right+14&&pageY>=r.top-14&&pageY<=r.bottom+14){
+                o.el.classList.add('glow');h=o.app.id;
+            }else o.el.classList.remove('glow');
+        });
+        S.hovered=h;
+    }
+}
+
+// ═══════════════════════════════════════════
+// FUNCTIONAL APPS
+// ═══════════════════════════════════════════
+const SONGS=[
+    {title:'Neon Horizons',artist:'Phantom Audio',dur:'3:42',color:'var(--cyan)'},
+    {title:'Digital Rain',artist:'Synthwave Labs',dur:'4:15',color:'var(--purple)'},
+    {title:'Quantum Drift',artist:'Spatial Sound',dur:'3:58',color:'var(--green)'},
+    {title:'Cyber Dreams',artist:'Phantom Audio',dur:'5:01',color:'var(--pink)'},
+    {title:'Holographic',artist:'Neural Beats',dur:'3:24',color:'var(--amber)'},
+    {title:'Zero Gravity',artist:'Spatial Sound',dur:'4:33',color:'var(--cyan)'},
+];
+
+const MSG_CONTACTS=[
+    {name:'Riya',initial:'R',color:'var(--purple)',lastMsg:'Are you coming to the demo?',time:'2m'},
+    {name:'Alex',initial:'A',color:'var(--cyan)',lastMsg:'Check out the new prototype!',time:'15m'},
+    {name:'Sam',initial:'S',color:'var(--green)',lastMsg:'Let\'s sync tomorrow morning',time:'1h'},
+];
+
+const MSG_CONVERSATIONS={
+    Riya:[
+        {from:'them',text:'Hey, are you coming to the demo?'},
+        {from:'me',text:'Be there in 10!'},
+        {from:'them',text:'Great, we\'re setting up now'},
+        {from:'them',text:'The hand tracking is so cool'},
+    ],
+    Alex:[
+        {from:'them',text:'Check out the new prototype!'},
+        {from:'me',text:'Just saw it, amazing work!'},
+        {from:'them',text:'Thanks! The keyboard is next'},
+    ],
+    Sam:[
+        {from:'them',text:'Let\'s sync tomorrow morning'},
+        {from:'me',text:'Sounds good, 10am works?'},
+        {from:'them',text:'Perfect, see you then'},
+    ]
+};
+
+let currentMsgContact=null;
+
+function openApp(id){
+    if(S.currentApp===id)return;
+    // Stop music if switching away from music app
+    if(S.currentApp==='music'&&id!=='music'){
+        if(S.musicTimer)clearInterval(S.musicTimer);S.musicPlaying=false;stopAudio();
+    }
+    const app=APPS.find(a=>a.id===id);if(!app)return;
+    S.currentApp=id;S.vkText='';updateVkDisplay();
+    $('#homeScreen').classList.add('hidden');$('#appView').classList.add('active');$('#homeBar').classList.add('show');$('#escHint').classList.add('show');$('#camBtn').style.opacity='0';$('#camBtn').style.pointerEvents='none';
+    $('#appViewTitle').innerHTML=`<i class="fa-solid ${app.icon}" style="color:${app.color}"></i> ${app.label}`;
+    let bd='';
+    switch(id){
+        case 'browser':bd=buildBrowserApp();break;
+        case 'messages':bd=buildMessagesApp();break;
+        case 'music':bd=buildMusicApp();break;
+        case 'calendar':bd=buildCalendarApp();break;
+        case 'notes':bd=buildNotesApp();break;
+        case 'settings':bd=buildSettingsApp();break;
+    }
+    $('#appViewBody').innerHTML=bd;toast('Opened '+app.label,'ok');showAction('Open '+app.label,app.color);playSound('open');
+    // Invalidate gesture target cache since DOM changed
+    markTargetsDirty();
+    // Initialize app-specific state
+    if(id==='music')initMusicApp();
+    if(id==='messages')initMessagesApp();
+    // Smart AI feedback for gesture-triggered opens (skip if voice already triggered processCmd)
+    if(!S._voiceActive)aiSystemFeedback('open_app','Opened '+app.label+' workspace');
+    setTimeout(()=>{S._voiceActive=false;},100);
+}
+
+// ── BROWSER APP ──
+function buildBrowserApp(){
+    return `<div style="max-width:600px;margin:0 auto;">
+        <div class="br-url-bar">
+            <i class="fa-solid fa-lock"></i>
+            <input class="br-url-input" id="brUrlInput" value="phantom.os" placeholder="Enter URL or search..." readonly>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:14px;">
+            <div onclick="navigateTo('phantom.os')" style="padding:5px 10px;border-radius:6px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.08);font-size:.62rem;color:var(--cyan);cursor:pointer;font-family:'Space Grotesk';">phantom.os</div>
+            <div onclick="navigateTo('spatial.design')" style="padding:5px 10px;border-radius:6px;background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.08);font-size:.62rem;color:var(--purple);cursor:pointer;font-family:'Space Grotesk';">spatial.design</div>
+            <div onclick="navigateTo('ai.research')" style="padding:5px 10px;border-radius:6px;background:rgba(34,197,94,.04);border:1px solid rgba(34,197,94,.08);font-size:.62rem;color:var(--green);cursor:pointer;font-family:'Space Grotesk';">ai.research</div>
+        </div>
+        <div id="brContent">${buildBrPage('phantom.os')}</div>
+    </div>`;
+}
+
+function navigateTo(url){
+    const content=document.getElementById('brContent');
+    const input=document.getElementById('brUrlInput');
+    if(input)input.value=url;
+    if(content)content.innerHTML=buildBrPage(url);
+}
+
+function buildBrPage(url){
+    if(url.includes('spatial.design')){
+        return `<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+            <div style="height:80px;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(0,212,255,.1));display:flex;align-items:center;padding:0 20px;">
+                <div><div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:var(--purple);">Spatial Design</div><div style="font-size:.58rem;color:var(--muted);">Next-generation interface patterns</div></div>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+                <div style="font-size:.74rem;font-weight:600;">Featured Articles</div>
+                <div onclick="navigateTo('spatial.gestures')" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:.68rem;font-weight:600;color:var(--cyan);">Gesture-First Navigation</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">How hand tracking replaces traditional input methods in spatial computing.</div></div>
+                <div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:.68rem;font-weight:600;color:var(--purple);">Holographic UI Patterns</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">Designing floating interfaces for mixed reality environments.</div></div>
+                <div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;"><div style="font-size:.68rem;font-weight:600;color:var(--green);">Accessibility in Spatial UI</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">Making gesture-based interfaces inclusive for all users.</div></div>
+            </div></div>`;
+    }
+    if(url.includes('ai.research')){
+        return `<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+            <div style="height:80px;background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(0,212,255,.08));display:flex;align-items:center;padding:0 20px;">
+                <div><div style="font-family:'Space Grotesk';font-size:1rem;font-weight:700;color:var(--green);">AI Research</div><div style="font-size:.58rem;color:var(--muted);">Advancing gesture recognition & spatial AI</div></div>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+                <div style="font-size:.74rem;font-weight:600;">Latest Papers</div>
+                <div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;"><div style="font-size:.68rem;font-weight:600;color:var(--green);">Real-Time Hand Pose Estimation</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">Sub-millisecond hand tracking with neural networks.</div></div>
+                <div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;"><div style="font-size:.68rem;font-weight:600;color:var(--amber);">Voice + Gesture Fusion</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">Multimodal input for spatial computing interfaces.</div></div>
+                <div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;"><div style="font-size:.68rem;font-weight:600;color:var(--cyan);">Virtual Keyboard Ergonomics</div><div style="font-size:.58rem;color:var(--muted);margin-top:3px;">Optimizing spatial typing for reduced hand fatigue.</div></div>
+            </div></div>`;
+    }
+    // Default phantom.os page
+    return `<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+        <div style="height:100px;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(139,92,246,.06));display:flex;align-items:center;justify-content:center;flex-direction:column;">
+            <div style="font-family:'Space Grotesk';font-size:1.4rem;font-weight:700;color:var(--cyan);letter-spacing:.15em;">PHANTOM OS</div>
+            <div style="font-size:.6rem;color:var(--muted);margin-top:4px;letter-spacing:.3em;">SPATIAL INTERACTION SYSTEM</div>
+        </div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="br-bookmark" onclick="navigateTo('spatial.design')"><div style="font-size:.72rem;font-weight:600;color:var(--cyan);margin-bottom:4px;">Spatial Design</div><div style="font-size:.58rem;color:var(--muted);">Next-gen UI patterns</div></div>
+            <div class="br-bookmark" onclick="navigateTo('ai.research')"><div style="font-size:.72rem;font-weight:600;color:var(--purple);">AI Research</div><div style="font-size:.58rem;color:var(--muted);">Gesture recognition</div></div>
+            <div class="br-bookmark"><div style="font-size:.72rem;font-weight:600;color:var(--green);">Haptic Interfaces</div><div style="font-size:.58rem;color:var(--muted);">Touchless control</div></div>
+            <div class="br-bookmark"><div style="font-size:.72rem;font-weight:600;color:var(--amber);">Phantom Labs</div><div style="font-size:.58rem;color:var(--muted);">Experimental projects</div></div>
+        </div>`;
+}
+
+// ── MESSAGES APP ──
+function buildMessagesApp(){
+    let contactsHtml=MSG_CONTACTS.map(c=>`
+        <div class="msg-contact" data-contact="${c.name}" onclick="openChat('${c.name}')">
+            <div class="msg-avatar" style="background:${c.color}15;color:${c.color};border:1px solid ${c.color}20;">${c.initial}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;"><span style="font-size:.72rem;font-weight:600;">${c.name}</span><span style="font-size:.56rem;color:var(--muted);">${c.time}</span></div>
+                <div style="font-size:.62rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.lastMsg}</div>
+            </div>
+        </div>`).join('');
+    return `<div style="max-width:500px;margin:0 auto;" id="msgApp">
+        <div id="msgContactList">${contactsHtml}</div>
+        <div id="msgChatView" style="display:none;"></div>
+    </div>`;
+}
+
+function initMessagesApp(){currentMsgContact=null;}
+
+function openChat(name){
+    currentMsgContact=name;
+    const convs=MSG_CONVERSATIONS[name]||[];
+    let bubbles=convs.map(m=>`<div class="msg-bubble ${m.from==='me'?'sent':'recv'}">${m.text}</div>`).join('');
+    const c=MSG_CONTACTS.find(x=>x.name===name);
+    const view=document.getElementById('msgChatView');
+    const list=document.getElementById('msgContactList');
+    if(view&&list){
+        view.style.display='flex';view.style.flexDirection='column';view.style.height='100%';
+        list.style.display='none';
+        view.innerHTML=`
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:10px;">
+                <div class="chat-back-btn" onclick="closeChat()" style="cursor:pointer;color:var(--muted);font-size:.8rem;padding:4px 8px;border-radius:6px;transition:all .2s;"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="msg-avatar" style="background:${c.color}15;color:${c.color};border:1px solid ${c.color}20;width:30px;height:30px;font-size:.62rem;">${c.initial}</div>
+                <div><div style="font-size:.74rem;font-weight:600;">${name}</div><div style="font-size:.54rem;color:var(--green);">Online</div></div>
+            </div>
+            <div id="msgBubbles" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:10px;">${bubbles}</div>
+            <div style="padding-top:8px;border-top:1px solid var(--border);font-size:.6rem;color:var(--muted);text-align:center;">Use <em style="color:var(--cyan);">Spatial Typing</em> mode to type, or <em style="color:var(--purple);">voice</em> to dictate</div>`;
+        const bbl=document.getElementById('msgBubbles');if(bbl)bbl.scrollTop=bbl.scrollHeight;
+        markTargetsDirty(); // New chat-back-btn added to DOM
+    }
+}
+
+function closeChat(){
+    const view=document.getElementById('msgChatView');
+    const list=document.getElementById('msgContactList');
+    if(view)view.style.display='none';
+    if(list)list.style.display='block';
+    currentMsgContact=null;
+    markTargetsDirty();
+}
+
+function addMsgBubble(text,type){
+    const bbl=document.getElementById('msgBubbles');
+    if(!bbl)return;
+    const div=document.createElement('div');div.className=`msg-bubble ${type}`;div.textContent=text;
+    bbl.appendChild(div);bbl.scrollTop=bbl.scrollHeight;
+    // Update conversation data
+    if(currentMsgContact&&MSG_CONVERSATIONS[currentMsgContact]){
+        MSG_CONVERSATIONS[currentMsgContact].push({from:type==='sent'?'me':'them',text});
+    }
+}
+
+// ═══════════════════════════════════════════
+// WEB AUDIO SYNTHESIZER — Actual music playback
+// ═══════════════════════════════════════════
+let audioCtx=null, masterGain=null, melodyTimeout=null, padOscs=[], melodyIdx=0, activeMelodyOscs=[];
+
+const SONG_NOTES=[
+    { // Neon Horizons — dreamy C major arpeggio
+        freqs:[261.63,329.63,392.00,523.25,392.00,329.63,293.66,349.23],
+        tempo:320, wave:'sine', padFreqs:[130.81,196.00,261.63], padWave:'sine'
+    },
+    { // Digital Rain — A minor descent
+        freqs:[440.00,392.00,349.23,329.63,293.66,261.63,293.66,329.63],
+        tempo:260, wave:'triangle', padFreqs:[220.00,164.81,130.81], padWave:'triangle'
+    },
+    { // Quantum Drift — E minor mysterious
+        freqs:[329.63,392.00,293.66,493.88,261.63,369.99,440.00,246.94],
+        tempo:380, wave:'sine', padFreqs:[164.81,196.00,246.94], padWave:'sine'
+    },
+    { // Cyber Dreams — G major ethereal
+        freqs:[392.00,493.88,587.33,659.25,783.99,659.25,587.33,493.88],
+        tempo:420, wave:'sine', padFreqs:[196.00,293.66,392.00], padWave:'triangle'
+    },
+    { // Holographic — D major upbeat
+        freqs:[293.66,329.63,369.99,440.00,493.88,440.00,369.99,329.63],
+        tempo:280, wave:'triangle', padFreqs:[146.83,220.00,293.66], padWave:'sine'
+    },
+    { // Zero Gravity — F major floaty
+        freqs:[349.23,440.00,523.25,349.23,440.00,523.25,659.25,523.25],
+        tempo:480, wave:'sine', padFreqs:[174.61,261.63,349.23], padWave:'sine'
+    }
+];
+
+function initAudio(){
+    if(audioCtx)return;
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    masterGain=audioCtx.createGain();
+    masterGain.gain.value=0.25;
+    masterGain.connect(audioCtx.destination);
+}
+
+function startAudio(idx){
+    initAudio();
+    stopAudio();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    const sn=SONG_NOTES[idx]||SONG_NOTES[0];
+    // Pad chord (sustained atmospheric background)
+    sn.padFreqs.forEach(f=>{
+        const osc=audioCtx.createOscillator();
+        osc.type=sn.padWave;
+        osc.frequency.value=f;
+        const g=audioCtx.createGain();
+        g.gain.setValueAtTime(0,audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0.06,audioCtx.currentTime+0.6);
+        const flt=audioCtx.createBiquadFilter();
+        flt.type='lowpass';flt.frequency.value=600;
+        osc.connect(flt);flt.connect(g);g.connect(masterGain);
+        osc.start();
+        padOscs.push({osc,gain:g});
+    });
+    // Melody sequence
+    melodyIdx=0;
+    playNextNote(sn);
+}
+
+function playNextNote(sn){
+    if(!S.musicPlaying||!audioCtx)return;
+    const freq=sn.freqs[melodyIdx%sn.freqs.length];
+    const dur=sn.tempo/1000;
+    const now=audioCtx.currentTime;
+    // Melody note with attack-decay envelope
+    const osc=audioCtx.createOscillator();
+    osc.type=sn.wave;
+    osc.frequency.value=freq;
+    const g=audioCtx.createGain();
+    g.gain.setValueAtTime(0,now);
+    g.gain.linearRampToValueAtTime(0.18,now+0.04);
+    g.gain.setValueAtTime(0.12,now+dur*0.5);
+    g.gain.linearRampToValueAtTime(0,now+dur*0.92);
+    const flt=audioCtx.createBiquadFilter();
+    flt.type='lowpass';flt.frequency.value=2000;
+    osc.connect(flt);flt.connect(g);g.connect(masterGain);
+    osc.start(now);osc.stop(now+dur);
+    // Track active melody oscillators so we can kill them all on stop
+    activeMelodyOscs.push({osc,gain:g,filter:flt});
+    osc.onended=()=>{activeMelodyOscs=activeMelodyOscs.filter(o=>o.osc!==osc);};
+    melodyIdx++;
+    melodyTimeout=setTimeout(()=>playNextNote(sn),sn.tempo);
+}
+
+function stopAudio(){
+    // Clear melody timeout first to stop scheduling new notes
+    if(melodyTimeout){clearTimeout(melodyTimeout);melodyTimeout=null;}
+    // Kill ALL active melody oscillators immediately (not with delayed stop)
+    activeMelodyOscs.forEach(o=>{
+        try{
+            o.gain.gain.cancelScheduledValues(audioCtx?audioCtx.currentTime:0);
+            o.gain.gain.setValueAtTime(0,audioCtx?audioCtx.currentTime:0);
+            o.osc.stop(audioCtx?audioCtx.currentTime+0.01:0);
+        }catch(e){}
+    });
+    activeMelodyOscs=[];
+    // Kill pad oscillators
+    if(audioCtx){
+        padOscs.forEach(p=>{
+            try{
+                p.gain.gain.cancelScheduledValues(audioCtx.currentTime);
+                p.gain.gain.setValueAtTime(0,audioCtx.currentTime);
+                p.osc.stop(audioCtx.currentTime+0.01);
+            }catch(e){}
+        });
+    }
+    padOscs=[];
+}
+
+// ── MUSIC APP ──
+function buildMusicApp(){
+    let songsHtml=SONGS.map((s,i)=>`
+        <div class="music-row ${i===0?'playing':''}" id="song${i}" onclick="playSong(${i})">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${s.color}15,${s.color}08);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-music" style="color:${s.color};font-size:.8rem;"></i></div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:.72rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.title}</div>
+                <div style="font-size:.58rem;color:var(--muted);">${s.artist}</div>
+            </div>
+            <div style="font-size:.56rem;color:var(--muted);margin-right:8px;">${s.dur}</div>
+            <div class="music-play-btn" onclick="event.stopPropagation();playSong(${i})"><i class="fa-solid ${i===0&&S.musicPlaying?'fa-pause':'fa-play'}" id="playIcon${i}"></i></div>
+        </div>`).join('');
+    return `<div style="max-width:450px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+            <div style="width:100px;height:100px;border-radius:24px;background:linear-gradient(135deg,var(--purple),var(--cyan));margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 8px 30px rgba(0,212,255,.15);"><i class="fa-solid fa-headphones" style="color:#fff;"></i></div>
+            <div style="font-size:.9rem;font-weight:700;font-family:'Space Grotesk';" id="musicTitle">${SONGS[0].title}</div>
+            <div style="font-size:.68rem;color:var(--muted);" id="musicArtist">${SONGS[0].artist}</div>
+            <div style="background:var(--surface);border-radius:6px;height:4px;margin:12px 0;overflow:hidden;"><div id="musicProgress" style="width:0%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:6px;transition:width .3s;"></div></div>
+            <div style="display:flex;justify-content:center;align-items:center;gap:2rem;font-size:1.2rem;color:var(--muted);">
+                <div class="music-ctrl" id="prevSongBtn" onclick="prevSong()" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;transition:all .2s;"><i class="fa-solid fa-backward-step"></i></div>
+                <div class="music-play-btn" style="width:48px;height:48px;font-size:1.1rem;border-color:rgba(0,212,255,.2);" id="mainPlayBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></div>
+                <div class="music-ctrl" id="nextSongBtn" onclick="nextSong()" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;transition:all .2s;"><i class="fa-solid fa-forward-step"></i></div>
+            </div>
+        </div>
+        <div style="font-size:.68rem;font-weight:600;margin-bottom:8px;font-family:'Space Grotesk';letter-spacing:.06em;">Queue</div>
+        ${songsHtml}
+    </div>`;
+}
+
+function initMusicApp(){S.musicPlaying=false;S.musicCurrent=0;S.musicProgress=0;if(S.musicTimer)clearInterval(S.musicTimer);stopAudio();}
+
+function playSong(idx){
+    S.musicCurrent=idx;S.musicProgress=0;S.musicPlaying=true;
+    updateMusicUI();
+    startMusicProgress();
+    startAudio(idx);
+    toast('Playing: '+SONGS[idx].title,'ok');
+}
+
+function togglePlay(){
+    S.musicPlaying=!S.musicPlaying;
+    if(S.musicPlaying){startMusicProgress();startAudio(S.musicCurrent);}else{if(S.musicTimer)clearInterval(S.musicTimer);stopAudio();}
+    updateMusicUI();
+}
+
+function prevSong(){playSong((S.musicCurrent-1+SONGS.length)%SONGS.length);}
+function nextSong(){playSong((S.musicCurrent+1)%SONGS.length);}
+
+function startMusicProgress(){
+    if(S.musicTimer)clearInterval(S.musicTimer);
+    S.musicTimer=setInterval(()=>{
+        if(!S.musicPlaying)return;
+        S.musicProgress+=0.5;
+        if(S.musicProgress>=100){nextSong();return;}
+        const bar=document.getElementById('musicProgress');
+        if(bar)bar.style.width=S.musicProgress+'%';
+    },300);
+}
+
+function updateMusicUI(){
+    const song=SONGS[S.musicCurrent];
+    const title=document.getElementById('musicTitle');
+    const artist=document.getElementById('musicArtist');
+    const btn=document.getElementById('mainPlayBtn');
+    const bar=document.getElementById('musicProgress');
+    if(title)title.textContent=song.title;
+    if(artist)artist.textContent=song.artist;
+    if(btn)btn.innerHTML=S.musicPlaying?'<i class="fa-solid fa-pause"></i>':'<i class="fa-solid fa-play"></i>';
+    if(bar)bar.style.width=S.musicProgress+'%';
+    // Update song list highlights
+    SONGS.forEach((s,i)=>{
+        const row=document.getElementById('song'+i);
+        const icon=document.getElementById('playIcon'+i);
+        if(row)row.classList.toggle('playing',i===S.musicCurrent);
+        if(icon)icon.className='fa-solid '+(i===S.musicCurrent&&S.musicPlaying?'fa-pause':'fa-play');
+    });
+}
+
+// ── NOTES APP ──
+function buildNotesApp(){
+    return `<div style="max-width:500px;margin:0 auto;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <div style="font-size:.68rem;color:var(--muted);"><i class="fa-solid fa-keyboard" style="margin-right:4px;color:var(--purple);"></i>Use Spatial Typing mode or voice to type</div>
+        </div>
+        <textarea class="note-editor" id="noteEditor" placeholder="Start typing your note...">PHANTOM OS — Notes
+
+Welcome to the spatial note-taking experience. Use the virtual keyboard in Spatial Typing mode to write, or dictate with voice commands.
+
+Quick tips:
+- Point cursor at keys to hover
+- Pinch to select and type
+- Palm gesture to go home
+- Voice: "Open notes" to get here quickly</textarea>
+    </div>`;
+}
+
+// ── CALENDAR APP ──
+function buildCalendarApp(){
+    return `<div style="max-width:500px;margin:0 auto;">
+        <div style="font-size:.82rem;font-weight:700;font-family:'Space Grotesk';margin-bottom:1rem;">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-size:.58rem;color:var(--muted);">${calG()}</div>
+        <div style="margin-top:1.2rem;border-top:1px solid var(--border);padding-top:1rem;">
+            <div style="font-size:.68rem;font-weight:600;margin-bottom:.6rem;">Today</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="background:rgba(0,212,255,.04);border-left:2px solid var(--cyan);padding:8px 12px;border-radius:0 6px 6px 0;font-size:.64rem;"><span style="color:var(--cyan);">09:00</span> — Team standup</div>
+                <div style="background:rgba(139,92,246,.04);border-left:2px solid var(--purple);padding:8px 12px;border-radius:0 6px 6px 0;font-size:.64rem;"><span style="color:var(--purple);">11:30</span> — PHANTOM OS demo</div>
+                <div style="background:rgba(34,197,94,.04);border-left:2px solid var(--green);padding:8px 12px;border-radius:0 6px 6px 0;font-size:.64rem;"><span style="color:var(--green);">14:00</span> — Spatial UI review</div>
+                <div style="background:rgba(245,158,11,.04);border-left:2px solid var(--amber);padding:8px 12px;border-radius:0 6px 6px 0;font-size:.64rem;"><span style="color:var(--amber);">16:30</span> — Voice integration test</div>
+            </div>
+        </div>
+    </div>`;
+}
+function calG(){const n=new Date(),fd=new Date(n.getFullYear(),n.getMonth(),1).getDay(),dim=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();let h='';['S','M','T','W','T','F','S'].forEach(d=>{h+=`<div style="font-weight:600;padding:4px">${d}</div>`;});for(let i=0;i<fd;i++)h+='<div style="padding:4px"></div>';for(let d=1;d<=dim;d++){const t=d===n.getDate();h+=`<div style="padding:4px;border-radius:6px;${t?'background:var(--cyan);color:#000;font-weight:700;':''}">${d}</div>`;}return h;}
+
+// ── SETTINGS APP ──
+function buildSettingsApp(){
+    return `<div style="max-width:400px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><span style="font-size:.68rem;">Camera</span><span style="font-size:.66rem;color:${S.camOn?'var(--green)':'var(--red)'};">${S.camOn?'Active':'Off'}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><span style="font-size:.68rem;">Hand Tracking</span><span style="font-size:.66rem;color:${S.handOn?'var(--green)':'var(--muted)'};">${S.handOn?'Active':'Off'}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><span style="font-size:.68rem;">Voice</span><span style="font-size:.66rem;color:${S.listening?'var(--green)':'var(--muted)'};">${S.listening?'Active':'Off'}</span></div>
+        <div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:.68rem;margin-bottom:8px;">Webcam Opacity</div><input type="range" min="0" max="40" value="15" style="width:100%;accent-color:var(--cyan);" oninput="document.getElementById('webcam').style.opacity=this.value/100"></div>
+        <div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"><div style="font-size:.68rem;margin-bottom:8px;">Cursor Smoothing</div><input type="range" min="30" max="90" value="65" style="width:100%;accent-color:var(--cyan);" id="smoothSlider" oninput="smoothingAlpha=this.value/100"></div>
+        <div style="text-align:center;padding:12px;font-size:.58rem;color:var(--muted);border-top:1px solid var(--border);margin-top:8px;">PHANTOM OS v2.0 &bull; Spatial Interaction System</div>
+    </div>`;
+}
+
+function goHome(){
+    playSound('close');
+    S.currentApp=null;S.hovered=null;S.gestureTarget=null;S.pinchLockTarget=null;S.pinchLockHover=null;S.vkText='';updateVkDisplay();S.vkLockedKey=null;S.vkPinchActive=false;S.vkHoveredKey=null;currentMsgContact=null;
+    // Thorough audio cleanup: stop all music, oscillators, timers
+    if(S.musicTimer)clearInterval(S.musicTimer);
+    S.musicPlaying=false;
+    stopAudio(); // Now properly kills ALL oscillators including in-flight melody notes
+    // Also close any chat
+    S.msgChatOpen=false;S.msgInput='';
+    $('#homeScreen').classList.remove('hidden');$('#appView').classList.remove('active');$('#homeBar').classList.remove('show');$('#escHint').classList.remove('show');$('#camBtn').style.opacity='1';$('#camBtn').style.pointerEvents='auto';
+    markTargetsDirty();
+    if(lastHoveredEl){lastHoveredEl.classList.remove('glow');lastHoveredEl=null;}
+    appItems.forEach(o=>o.el.classList.remove('glow'));
+    // Smart AI feedback for gesture-triggered home (skip if voice already handling)
+    if(!S._voiceActive)aiSystemFeedback('navigate','Returning to home interface');
+    setTimeout(()=>{S._voiceActive=false;},100);
+}
+
+// ═══════════════════════════════════════════
+// VOICE — Enhanced with more commands
+// ═══════════════════════════════════════════
+let rec=null,voiceOk=false,voiceTransitioning=false,voiceDebounce=null,lastVoiceText='';
+
+function initVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('#dVoice').className='dot off';return;}voiceOk=true;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang='en-US';rec.maxAlternatives=1;
+rec.onresult=e=>{
+    let fin='',inter='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        e.results[i].isFinal?fin+=t:inter+=t;
+    }
+    // Show interim text immediately for visual feedback
+    if(inter)$('#vTxt').textContent=inter;
+    if(fin){
+        const cmd=fin.trim();
+        // IMMEDIATE visual feedback for voice recognition
+        $('#vTxt').textContent=cmd;
+        playSound('click');
+        // Debounce: ignore duplicate commands within 600ms (prevents double-firing)
+        if(cmd!==lastVoiceText||!voiceDebounce){
+            lastVoiceText=cmd;
+            if(voiceDebounce)clearTimeout(voiceDebounce);
+            voiceDebounce=setTimeout(()=>{voiceDebounce=null;},600);
+            processCmd(cmd);
+        }
+        $('#vTxt').textContent='Listening...';
+    }
+};
+rec.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture'){
+        S.listening=false;$('#micIc').classList.remove('on');$('#micLb').textContent='Voice Off';$('#vPill').classList.remove('on');$('#dVoice').className='dot err';toast('Voice denied — check permissions','err');return;
+    }
+    if(e.error!=='no-speech'&&e.error!=='aborted')console.warn('SR:',e.error);
+};
+rec.onend=()=>{
+    // Auto-restart: keep listening if user hasn't toggled off
+    if(S.listening){
+        try{rec.start();}catch(e){
+            // If restart fails, retry once after 150ms
+            setTimeout(()=>{
+                if(S.listening){
+                    try{rec.start();}catch(e2){
+                        S.listening=false;$('#micIc').classList.remove('on');$('#micLb').textContent='Voice Off';$('#vPill').classList.remove('on');$('#dVoice').className='dot off';
+                    }
+                }
+            },150);
+        }
+    }
+};}
+
+function toggleVoice(){
+    if(voiceTransitioning)return;if(!voiceOk){toast('Voice not supported','err');return;}
+    S.listening=!S.listening;voiceTransitioning=true;
+    if(S.listening){
+        try{rec.start();}catch(e){S.listening=false;voiceTransitioning=false;toast('Voice start failed','err');return;}
+        playSound('voice');
+        $('#micIc').classList.add('on');$('#micLb').textContent='Voice On';$('#vPill').classList.add('on');$('#dVoice').className='dot on';toast('Voice on — speak a command','voice');showAction('Voice On','var(--purple)');
+    }else{
+        try{rec.stop();}catch(e){}
+        $('#micIc').classList.remove('on');$('#micLb').textContent='Voice Off';$('#vPill').classList.remove('on');$('#dVoice').className='dot off';toast('Voice off','info');
+    }
+    setTimeout(()=>{voiceTransitioning=false;},300);
+}
+
+function processCmd(txt){
+    S._voiceActive=true; // Flag so openApp/goHome don't double-send AI feedback
+    const lo=txt.toLowerCase();addMsg('user',txt);toast('"'+txt+'"','voice');
+
+    // INSTANT visual acknowledgment — feels futuristic
+    showAction(lo.includes('open')?'Opening...':'Processing...','var(--cyan)');
+
+    // ── SYSTEM COMMANDS: Execute instantly, then get AI commentary ──
+    let sysAction=null,sysCtx='';
+
+    if(lo.includes('hey phantom')){
+        sysAction='wake';sysCtx='User called the assistant';
+    }
+    else if(lo.includes('premium ai')||lo.includes('quality ai')||lo.includes('max quality')){
+        PHANTOM_AI.activeModel='quality';addMsg('bot','<em>Premium AI</em> activated. Using Qwen3-235B for deeper responses.');return;
+    }
+    else if(lo.includes('fast ai')||lo.includes('standard ai')||lo.includes('normal ai')){
+        PHANTOM_AI.activeModel='chat';addMsg('bot','<em>Standard AI</em> mode. Fast and responsive.');return;
+    }
+    else if(lo.includes('focus mode')||lo.includes('activate focus')){
+        setMode('focus');sysAction='mode_change';sysCtx='Switched to Focus mode';
+    }
+    else if(lo.includes('entertainment')){
+        setMode('entertainment');sysAction='mode_change';sysCtx='Switched to Entertainment mode';
+    }
+    else if(lo.includes('productivity')||lo.includes('workspace')){
+        setMode('productivity');sysAction='mode_change';sysCtx='Switched to Productivity mode';
+    }
+    else if(lo.includes('typing mode')||lo.includes('spatial typing')||lo.includes('keyboard')){
+        setMode('spatial_typing');sysAction='mode_change';sysCtx='Activated Spatial Typing keyboard';
+    }
+    else if(lo.includes('ai assistant')||lo.includes('assistant mode')){
+        setMode('ai_assistant');sysAction='mode_change';sysCtx='Switched to AI Assistant mode';
+    }
+    else if(lo.includes('light mode')||lo.includes('light theme')||lo.includes('day mode')){
+        toggleTheme('light');sysAction='theme_change';sysCtx='Switched to Light mode';
+    }
+    else if(lo.includes('dark mode')||lo.includes('dark theme')||lo.includes('night mode')){
+        toggleTheme('dark');sysAction='theme_change';sysCtx='Switched to Dark mode';
+    }
+    else if(lo.includes('open browser')){
+        openApp('browser');sysAction='open_app';sysCtx='Opening Browser';
+    }
+    else if(lo.includes('open message')||lo.includes('open messenger')||lo.includes('open chat')){
+        openApp('messages');sysAction='open_app';sysCtx='Opening Messages';
+    }
+    else if(lo.includes('open music')||lo.includes('play music')){
+        openApp('music');if(lo.includes('play')){setTimeout(()=>playSong(0),500);}sysAction='open_app';sysCtx='Opening Music'+(lo.includes('play')?' and playing':'');
+    }
+    else if(lo.includes('open calendar')){
+        openApp('calendar');sysAction='open_app';sysCtx='Opening Calendar';
+    }
+    else if(lo.includes('open note')){
+        openApp('notes');sysAction='open_app';sysCtx='Opening Notes';
+    }
+    else if(lo.includes('open setting')){
+        openApp('settings');sysAction='open_app';sysCtx='Opening Settings';
+    }
+    else if(/\b(go\s+home|go\s+back)\b/i.test(lo)){
+        goHome();sysAction='navigate';sysCtx='Returning to home interface';
+    }
+    else if(lo.includes('enable camera')||lo.includes('start camera')){
+        if(!S.camOn)requestCamera();sysAction='camera';sysCtx='Enabling camera';
+    }
+    else if(lo.includes('clear')&&S.currentApp==='notes'){
+        const ed=document.getElementById('noteEditor');if(ed)ed.value='';sysAction='clear';sysCtx='Notes cleared';
+    }
+    else if(lo.includes('time')){
+        sysAction='info';sysCtx='Time is '+new Date().toLocaleTimeString();
+    }
+    else if(lo.includes('date')){
+        sysAction='info';sysCtx='Date is '+new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    }
+    else if(lo.includes('help')){
+        sysAction='help';sysCtx='Listing available commands';
+    }
+    // Voice dictation for notes/messenger
+    else if(S.currentApp==='notes'){
+        const ed=document.getElementById('noteEditor');
+        if(ed){ed.value+=txt+' ';}
+        sysAction='dictate';sysCtx='Dictated to notes';
+    }
+    else if(S.currentApp==='messages'&&currentMsgContact){
+        addMsgBubble(txt,'sent');
+        setTimeout(()=>{const replies=['Got it!','Sounds good!','On my way!','Sure!','Awesome!'];addMsgBubble(replies[Math.floor(Math.random()*replies.length)],'recv');},1200);
+        sysAction='message';sysCtx='Sent message to '+currentMsgContact;
+    }
+
+    // ── Execute + respond ──
+    if(sysAction){
+        // Instant fallback for time/date/help
+        if(sysAction==='time'){addMsg('bot',`It's <em>${new Date().toLocaleTimeString()}</em>`);return;}
+        if(sysAction==='info'&&lo.includes('date')){addMsg('bot',`Today is <em>${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</em>`);return;}
+        if(sysAction==='help'){addMsg('bot','Commands: <em>"open browser"</em>, <em>"open music"</em>, <em>"play music"</em>, <em>"open notes"</em>, <em>"open messenger"</em>, <em>"go home"</em>, <em>"focus mode"</em>, <em>"typing mode"</em>, <em>"light mode"</em>, <em>"dark mode"</em>, <em>"premium ai"</em>, <em>"fast ai"</em>, <em>"time"</em>, <em>"date"</em>');return;}
+        if(sysAction==='dictate'){addMsg('bot','Dictated to notes: <em>'+txt+'</em>');return;}
+        if(sysAction==='message'){addMsg('bot','Message sent to <em>'+currentMsgContact+'</em>');return;}
+
+        // For all other system actions, get AI commentary
+        showTypingIndicator();
+        // Quick fallback for instant feedback
+        const fbTimeout=setTimeout(()=>{
+            removeTypingIndicator();
+            addMsg('bot',sysFallback(sysAction,sysCtx));
+        },3000); // Fallback after 3s if AI is slow
+
+        aiChat(txt).then(reply=>{
+            clearTimeout(fbTimeout);
+            removeTypingIndicator();
+            if(reply)addMsg('bot',reply);
+            else addMsg('bot',sysFallback(sysAction,sysCtx));
+        });
+    }else{
+        // ── NON-COMMAND: Pure AI conversation ──
+        showTypingIndicator();
+        const fbTimeout=setTimeout(()=>{
+            removeTypingIndicator();
+            addMsg('bot',smartR(txt));
+        },4000);
+
+        aiChat(txt).then(reply=>{
+            clearTimeout(fbTimeout);
+            removeTypingIndicator();
+            if(reply)addMsg('bot',reply);
+            else addMsg('bot',smartR(txt));
+        });
+    }
+}
+
+// Cinematic fallback for system actions (used when AI is unavailable)
+function sysFallback(action,ctx){
+    const fallbacks={
+        wake:'Yes? I\'m listening. What would you like to do?',
+        mode_change:`<em>${ctx}</em> initialized.`,
+        theme_change:`<em>${ctx}</em> applied.`,
+        open_app:`${ctx} workspace loaded.`,
+        navigate:'Returning to <em>home interface</em>.',
+        camera:'Initializing <em>camera feed</em>...',
+        clear:`${ctx}.`,
+        info:ctx,
+    };
+    return fallbacks[action]||ctx;
+}
+
+function smartR(t){return[`Try <em>"open browser"</em> or <em>"play music"</em>.`,`Point to move, pinch to click, palm for home.`,`Say <em>"help"</em> for all commands.`][Math.floor(Math.random()*3)];}
+
+function addMsg(type,html){const el=document.createElement('div');el.className=`msg ${type}`;el.innerHTML=html;$('#aiMsgs').appendChild(el);$('#aiMsgs').scrollTop=$('#aiMsgs').scrollHeight;}
+function sendAI(){const t=$('#aiIn').value.trim();if(!t)return;$('#aiIn').value='';processCmd(t);}
+
+function setMode(m){
+    if(!MODES[m])return;playSound('mode');S.mode=m;
+    $$('.m-btn').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+    $('#modeTag').textContent=MODES[m].label;$('#modeTag').style.color=MODES[m].accent;
+    const c=$('#centerArea');c.style.filter=m==='focus'?'saturate(.5) brightness(.85)':m==='entertainment'?'saturate(1.3) brightness(1.05)':'none';
+    // Show/hide virtual keyboard
+    const vk=$('#vkOverlay');
+    if(m==='spatial_typing'){vk.classList.add('active');}
+    else{vk.classList.remove('active');S.vkText='';updateVkDisplay();S.vkLockedKey=null;S.vkPinchActive=false;S.vkHoveredKey=null;}
+    // Update hints
+    if(m==='spatial_typing'){$('#hintBar').innerHTML='<div class="hint-item active-hint" data-hint="point"><i class="fa-solid fa-hand-pointer"></i> Point = Hover Key</div><div class="hint-item" data-hint="pinch"><i class="fa-solid fa-hand-peace"></i> Pinch = Type</div><div class="hint-item" data-hint="palm"><i class="fa-solid fa-hand"></i> Palm = Home</div><div class="hint-item" data-hint="voice"><i class="fa-solid fa-microphone"></i> V = Voice</div>';}
+    else{$('#hintBar').innerHTML='<div class="hint-item" data-hint="point"><i class="fa-solid fa-hand-pointer"></i> Point = Move</div><div class="hint-item" data-hint="pinch"><i class="fa-solid fa-hand-peace"></i> Pinch = Click</div><div class="hint-item" data-hint="palm"><i class="fa-solid fa-hand"></i> Palm = Home</div><div class="hint-item" data-hint="voice"><i class="fa-solid fa-microphone"></i> V = Voice</div>';}
+    // Smart AI feedback for gesture-triggered mode change (skip if voice already handling)
+    if(!S._voiceActive)aiSystemFeedback('mode_change',MODES[m].label+' initialized');
+}
+
+function toast(msg,type='info'){const c=$('#toasts'),el=document.createElement('div');el.className=`toast toast-${type==='ok'?'ok':type==='voice'?'voice':type==='err'?'err':'info'}`;el.textContent=msg;c.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2500);}
+
+function toggleTheme(t){
+    if(t)S.theme=t;else S.theme=S.theme==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',S.theme);
+    const ic=$('#themeIc');
+    if(ic)ic.innerHTML=S.theme==='dark'?'<i class="fa-solid fa-moon"></i>':'<i class="fa-solid fa-sun"></i>';
+    // Invalidate grid cache so it redraws with correct color
+    gridDirty=true;
+    toast(S.theme==='dark'?'Dark mode':'Light mode','info');
+    showAction(S.theme==='dark'?'Dark':'Light',S.theme==='dark'?'var(--cyan)':'var(--amber)');
+    // Smart AI feedback for gesture-triggered theme change (skip if voice already handling)
+    if(!S._voiceActive)aiSystemFeedback('theme_change',(S.theme==='dark'?'Dark':'Light')+' mode applied');
+    setTimeout(()=>{S._voiceActive=false;},100);
+}
+
+// ═══════════════════════════════════════════
+// RENDER LOOP — Improved cursor smoothing
+// ═══════════════════════════════════════════
+let smoothingAlpha=0.65;  // Higher = snappier cursor follow
+let _lastFrame=0;
+let _cursorEl=null;  // Cached cursor element ref
+let _centerRect=null; // Cached center area rect
+let _centerRectFrame=0;
+
+function loop(ts){
+    if(PERF.frameThrottle>0 && ts-_lastFrame<PERF.frameThrottle){requestAnimationFrame(loop);return;}
+    _lastFrame=ts;
+    S.frame++;
+
+    // ══ ADVANCED CURSOR SMOOTHING ══
+    const isTyping=S.mode==='spatial_typing';
+    const rawDx=S.rawX-S.sx, rawDy=S.rawY-S.sy;
+    const rawDist=Math.sqrt(rawDx*rawDx+rawDy*rawDy);
+    
+    // Velocity from last frame
+    const velX=S.sx-S._prevSx||0, velY=S.sy-S._prevSy||0;
+    const speed=Math.sqrt(velX*velX+velY*velY);
+    S._prevSx=S.sx; S._prevSy=S.sy;
+    
+    // Adaptive alpha based on movement speed
+    // Fast movement → high alpha (snappy follow)
+    // Slow movement → low alpha (stable, no jitter)
+    let alpha;
+    if(rawDist<1.5){
+        // Micro-jitter: don't follow, stay put (kills hand tremor)
+        alpha=0.08;
+    }else if(rawDist<5){
+        // Small movement: moderate follow
+        alpha=0.45;
+    }else if(rawDist<20){
+        // Medium movement: responsive follow
+        alpha=0.7;
+    }else{
+        // Fast movement: aggressive follow
+        alpha=Math.min(0.85+rawDist*0.002, 0.95);
+    }
+    if(isTyping) alpha=Math.min(alpha+0.1, 0.8); // Slightly more responsive for typing
+    
+    // Prediction: use velocity to predict where the hand is going
+    const predictFactor=speed>15?0.12:speed>5?0.06:0.02;
+    
+    // Apply smoothing
+    S.sx+=alpha*rawDx;
+    S.sy+=alpha*rawDy;
+    
+    // Velocity prediction
+    S.pvx=(S.sx-S._prevSx)*predictFactor+S.pvx*0.6;
+    S.pvy=(S.sy-S._prevSy)*predictFactor+S.pvy*0.6;
+    
+    // Dampen velocity when no movement
+    if(rawDist<1.5){S.pvx*=0.1;S.pvy*=0.1;}
+    
+    const dispX=S.sx+S.pvx;
+    const dispY=S.sy+S.pvy;
+    
+    // ══ HOVER STABILIZATION ══
+    // When hovering a target, apply gentle attraction toward target center
+    // This prevents jitter from pushing cursor off small targets
+    let stabX=dispX, stabY=dispY;
+    const hovTarget=S.gestureTarget||S.vkHoveredKey;
+    if(hovTarget && rawDist<15){
+        try{
+            const el=hovTarget.el||hovTarget;
+            if(el && el.getBoundingClientRect){
+                const r=el.getBoundingClientRect();
+                const cx=r.left+r.width/2, cy=r.top+r.height/2;
+                const attractStrength=0.15; // Gentle pull toward center
+                stabX=dispX+(cx-dispX)*attractStrength;
+                stabY=dispY+(cy-dispY)*attractStrength;
+            }
+        }catch(e){}
+    }
+
+    if(!_cursorEl) _cursorEl=$('#phantomCursor');
+
+    if(S.handOn){
+        _cursorEl.style.left=stabX+'px';_cursorEl.style.top=stabY+'px';_cursorEl.classList.add('vis');
+        S.trail.push({x:stabX,y:stabY,t:Date.now()});if(S.trail.length>PERF.trailLen)S.trail.shift();
+        chkAllHover(stabX,stabY);
+        if(S.mode==='spatial_typing'){
+            if(!_centerRect||(S.frame-_centerRectFrame)>12){_centerRect=$('#centerArea').getBoundingClientRect();_centerRectFrame=S.frame;}
+            checkVkHover(stabX-_centerRect.left,stabY-_centerRect.top);
+        }
+    }else if(S.mouseOver){
+        _cursorEl.style.left=stabX+'px';_cursorEl.style.top=stabY+'px';_cursorEl.classList.add('vis');
+        chkAllHover(stabX,stabY);
+        if(S.mode==='spatial_typing'){
+            if(!_centerRect||(S.frame-_centerRectFrame)>12){_centerRect=$('#centerArea').getBoundingClientRect();_centerRectFrame=S.frame;}
+            checkVkHover(stabX-_centerRect.left,stabY-_centerRect.top);
+        }
+    }else{
+        _cursorEl.classList.remove('vis');S.trail.length=0;
+    }
+
+    // Subtle parallax on home screen
+    const homeGrid=$('#appGrid');
+    if(homeGrid && !S.currentApp && S.handOn){
+        const cx=(stabX-innerWidth/2)/innerWidth;
+        const cy=(stabY-innerHeight/2)/innerHeight;
+        homeGrid.style.transform=`translate(${cx*8}px,${cy*6}px)`;
+    }else if(homeGrid && S.currentApp){
+        homeGrid.style.transform='';
+    }
+
+    drawAtmo();drawOv();
+    requestAnimationFrame(loop);
+}
+
+function drawOv(){
+    const c=$('#overlayCanvas'),ctx=c.getContext('2d'),w=c.width,h=c.height;
+    // Skip drawing if no trail points and no hand (save canvas clears)
+    if(!S.trail.length && !lastLM){return;}
+    ctx.clearRect(0,0,w,h);
+    // Trail — use cached centerArea rect
+    if(!_centerRect||(S.frame-_centerRectFrame)>12){_centerRect=$('#centerArea').getBoundingClientRect();_centerRectFrame=S.frame;}
+    const trailRGB=S.theme==='light'?'0,102,238':'0,212,255';
+    for(let i=0;i<S.trail.length;i++){const p=S.trail[i],age=(Date.now()-p.t)/180;if(age>1)continue;const a=(1-age)*.1,s=(1-age)*2;const px=p.x-_centerRect.left,py=p.y-_centerRect.top;ctx.beginPath();ctx.arc(px,py,Math.max(.3,s),0,Math.PI*2);ctx.fillStyle=`rgba(${trailRGB},${a})`;ctx.fill();}
+    // Hand skeleton or fingertip
+    if(lastLM&&S.handOn){
+        const skRGB=S.theme==='light'?'0,102,238':'0,212,255';
+        if(PERF.drawHandSkeleton){
+            drawH(lastLM,w,h,ctx,skRGB);
+        }else{
+            const x=(1-lastLM[8].x)*w,y=lastLM[8].y*h;
+            ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=`rgba(${skRGB},.85)`;ctx.fill();
+            ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fillStyle=`rgba(${skRGB},.1)`;ctx.fill();
+        }
+    }
+}
+
+function drawH(lm,w,h,ctx,rgb){
+    rgb=rgb||'0,212,255';
+    const conns=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
+    ctx.lineWidth=2;ctx.lineCap='round';
+    for(const[a,b]of conns){
+        const ax=(1-lm[a].x)*w,ay=lm[a].y*h,bx=(1-lm[b].x)*w,by=lm[b].y*h;
+        ctx.strokeStyle=`rgba(${rgb},.25)`;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();
+    }
+    [4,8,12,16,20].forEach(idx=>{
+        const x=(1-lm[idx].x)*w,y=lm[idx].y*h,isI=idx===8;
+        ctx.beginPath();ctx.arc(x,y,isI?10:6,0,Math.PI*2);ctx.fillStyle=isI?`rgba(${rgb},.06)`:`rgba(${rgb},.03)`;ctx.fill();
+        ctx.beginPath();ctx.arc(x,y,isI?6:4,0,Math.PI*2);ctx.fillStyle=isI?`rgba(${rgb},.12)`:`rgba(${rgb},.05)`;ctx.fill();
+        ctx.beginPath();ctx.arc(x,y,isI?4:2,0,Math.PI*2);ctx.fillStyle=isI?`rgba(${rgb},.85)`:`rgba(${rgb},.4)`;ctx.fill();
+    });
+}
+
+// ═══════════════════════════════════════════
+// LISTENERS
+// ═══════════════════════════════════════════
+function setupListeners(){
+    $$('.m-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+    $('#micTog').addEventListener('click',toggleVoice);
+    $('#themeTog').addEventListener('click',toggleTheme);
+    $('#aiSnd').addEventListener('click',sendAI);
+    $('#aiIn').addEventListener('keydown',e=>{if(e.key==='Enter')sendAI();});
+    document.addEventListener('keydown',e=>{
+        if(e.target===$('#aiIn'))return;
+        if(e.key==='1')setMode('productivity');if(e.key==='2')setMode('entertainment');if(e.key==='3')setMode('focus');if(e.key==='4')setMode('spatial_typing');if(e.key==='5')setMode('ai_assistant');
+        if(e.key==='v'||e.key==='V')toggleVoice();if(e.key==='Escape')goHome();if(e.key==='?')showOb();if(e.key==='t'||e.key==='T')toggleTheme();
+        // Keyboard typing in spatial typing mode
+        if(S.mode==='spatial_typing'&&S.currentApp){
+            if(e.key.length===1){S.vkText+=e.key;updateVkDisplay();deliverKeyToApp(e.key);}
+            if(e.key==='Backspace'){S.vkText=S.vkText.slice(0,-1);updateVkDisplay();deliverKeyToApp('Backspace');}
+            if(e.key==='Enter'){handleVkEnter();}
+        }
+    });
+    // Mouse move on entire document for full-page cursor support
+    document.addEventListener('mousemove',e=>{
+        if(!S.handOn){
+            S.mouseOver=true;
+            S.rawX=e.clientX;S.rawY=e.clientY;
+        }
+    });
+    document.addEventListener('mouseleave',()=>{
+        if(!S.handOn){
+            S.mouseOver=false;$('#phantomCursor').classList.remove('vis');S.hovered=null;
+            appItems.forEach(o=>o.el.classList.remove('glow'));
+            if(lastHoveredEl){lastHoveredEl.classList.remove('glow');lastHoveredEl=null;}
+            vkKeyEls.forEach(k=>{k.el.classList.remove('vk-hover');k.el.classList.remove('vk-locked');k.el.classList.remove('vk-dwell');});
+            S.vkHoveredKey=null;S.vkLockedKey=null;S.vkPinchActive=false;S.gestureTarget=null;S.pinchLockTarget=null;S.pinchLockHover=null;
+        }
+    });
+    $('#centerArea').addEventListener('click',e=>{
+        if(e.target.closest('.cam-btn,.cam-error-popup,.home-bar,.back-btn,.vk-overlay,.music-play-btn,.br-bookmark,.msg-contact,.music-row'))return;
+        if(S.hovered){openApp(S.hovered);S.hovered=null;}
+    });
+    // Mouse click on keyboard keys handled via mousedown on each key (see buildKeyboard)
+}
+
+boot();
+</script>
+</body>
+</html>
